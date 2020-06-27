@@ -1,0 +1,16 @@
+{
+  "name": "mazes",
+  "version": "1.0.0",
+  "main": "build/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "nodemon --watch 'src/**/*.ts' --exec ts-node src/main.ts"
+  },
+  "dependencies": {
+    "@types/node": "^14.0.14",
+    "@yarnpkg/pnpify": "^2.0.0-rc.25",
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
+  }
+}
