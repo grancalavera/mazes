@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import { fromSome, Maybe, none, some } from "./maybe";
 
 interface Cell {
   readonly exits: Exits[];
@@ -26,15 +27,6 @@ type Linked = (grid: Grid, c1: Cell, c2: Cell) => boolean;
 type MakeGrid = (rows: number, cols: number) => Grid;
 type MakeCell = (pos: Pos) => Cell;
 
-type Maybe<T> = Some<T> | None;
-type Some<T> = { readonly kind: "Some"; readonly value: T };
-type None = { readonly kind: "None" };
-
-const some = <T>(value: T): Maybe<T> => ({ kind: "Some", value });
-const none: Maybe<never> = { kind: "None" };
-const isSome = <T>(m: Maybe<T>): m is Some<T> => m.kind === "Some";
-const isNone = (m: Maybe<unknown>): m is None => m.kind === "None";
-
 const makeGrid: MakeGrid = (rows, cols) => {
   const p = indexToPos(rows, cols);
   return {
@@ -58,14 +50,6 @@ const indexToPos = (rows: number, cols: number) => (i: number): Maybe<Pos> => {
 const posToIndex = (rows: number, cols: number) => ({ row, col }: Pos): Maybe<number> => {
   if (row < 0 || rows <= row || col < 0 || cols <= col) return none;
   return some(col + row * cols);
-};
-
-const fromSome = <T>(m: Maybe<T>): T => {
-  if (isSome(m)) {
-    return m.value;
-  }
-
-  throw new Error("None is not Some<T>");
 };
 
 assert.deepStrictEqual(
