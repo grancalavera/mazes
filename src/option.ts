@@ -1,4 +1,5 @@
 export type Option<T> = Some<T> | None;
+
 type Some<T> = { readonly kind: "Some"; readonly value: T };
 type None = { readonly kind: "None" };
 
