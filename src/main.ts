@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { fromSome, Maybe, none, some } from "./maybe";
+import { fromSome, Option, none, some } from "./option";
 
 interface Cell {
   readonly exits: Exits[];
@@ -39,7 +39,7 @@ const makeGrid: MakeGrid = (rows, cols) => {
 const makeCell: MakeCell = (pos) => ({ pos, exits: [] });
 
 // https://stackoverflow.com/questions/5991837/row-major-order-indices
-const indexToPos = (rows: number, cols: number) => (i: number): Maybe<Pos> => {
+const indexToPos = (rows: number, cols: number) => (i: number): Option<Pos> => {
   if (i < 0 || rows * cols <= i) return none;
   const row = Math.floor(i / cols);
   const col = i - row * cols;
@@ -47,7 +47,10 @@ const indexToPos = (rows: number, cols: number) => (i: number): Maybe<Pos> => {
 };
 
 // https://stackoverflow.com/questions/5991837/row-major-order-indices
-const posToIndex = (rows: number, cols: number) => ({ row, col }: Pos): Maybe<number> => {
+const posToIndex = (rows: number, cols: number) => ({
+  row,
+  col,
+}: Pos): Option<number> => {
   if (row < 0 || rows <= row || col < 0 || cols <= col) return none;
   return some(col + row * cols);
 };
