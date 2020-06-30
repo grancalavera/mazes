@@ -1,4 +1,4 @@
-import { none, Option, some } from "./option";
+import { none, Option, some, fromSome } from "./option";
 
 export type Position = [Row, Col];
 export type Dimensions = [RowCount, ColCount];
@@ -36,3 +36,6 @@ export const isValidPosition = ([rowCount, colCount]: Dimensions) => ([
   row,
   col,
 ]: Position): boolean => 0 <= row && row < rowCount && 0 <= col && col < colCount;
+
+export const unsafePositionFromIndex = (d: Dimensions) => (i: Index): Position =>
+  fromSome(positionFromIndex(d)(i));
