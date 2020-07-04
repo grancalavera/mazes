@@ -23,20 +23,22 @@ export const empty: Neighbors = {
 export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
   const neighborAt = findNeighborAt(d, p);
   return {
-    north: neighborAt(north),
-    east: neighborAt(east),
-    south: neighborAt(south),
-    west: neighborAt(west),
+    north: neighborAt(walkNorth),
+    east: neighborAt(walkEast),
+    south: neighborAt(walkSouth),
+    west: neighborAt(walkWest),
   };
 };
 
-const findNeighborAt = (d: Dimensions, p: Position) => (walk: Walk): Option<Position> => {
+const findNeighborAt = (d: Dimensions, p: Position) => (
+  walk: Walk
+): Option<Position> => {
   const candidate = walk(p);
   return isValidPosition(d)(candidate) ? some(candidate) : none;
 };
 
 type Walk = (p: Position) => Position;
-const north: Walk = ([row, col]) => [row + 1, col];
-const south: Walk = ([row, col]) => [row - 1, col];
-const east: Walk = ([row, col]) => [row, col + 1];
-const west: Walk = ([row, col]) => [row, col - 1];
+const walkNorth: Walk = ([row, col]) => [row + 1, col];
+const walkSouth: Walk = ([row, col]) => [row - 1, col];
+const walkEast: Walk = ([row, col]) => [row, col + 1];
+const walkWest: Walk = ([row, col]) => [row, col - 1];
