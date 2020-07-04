@@ -1,4 +1,4 @@
-import { none, Option, some } from "./option";
+import { none, Option, some, isSome, fromSome } from "./option";
 import { Dimensions, isValidPosition, Position } from "./plane";
 
 //   N   2
@@ -19,6 +19,9 @@ export const empty: Neighbors = {
   south: none,
   west: none,
 };
+
+export const toArray = (n: Neighbors): Position[] =>
+  (Object.values(n) as Option<Position>[]).filter(isSome).map(fromSome);
 
 export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
   const neighborAt = findNeighborAt(d, p);
