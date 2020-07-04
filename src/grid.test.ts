@@ -22,4 +22,15 @@ describe("Grid.linkCells", () => {
     expect(linksTo(i, a, b)).toBe(false);
     expect(linksTo(i, b, a)).toBe(false);
   });
+
+  it("link should only link neighbors", () => {
+    // 1 (1,0) (1,1)
+    // 0 (0,0) (0,1)
+    // - 0      1
+    const x: Position = [0, 0];
+    const y: Position = [1, 1];
+    const j = makeGrid([2, 2]);
+    const l = linkCells(j, x, y);
+    expect(linksTo(l, x, y)).toBe(false);
+  });
 });

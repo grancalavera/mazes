@@ -1,28 +1,22 @@
 import * as n from "./neighbors";
+import * as p from "./plane";
 import { isSome } from "./option";
-import {
-  Dimensions,
-  Index,
-  Position,
-  positionToIndex,
-  unsafePositionFromIndex,
-} from "./plane";
 
 interface Cell {
-  readonly index: Index;
-  readonly pos: Position;
+  readonly index: p.Index;
+  readonly pos: p.Position;
   readonly neighbors: n.Neighbors;
 }
 
 interface Grid {
-  readonly dimensions: Dimensions;
+  readonly dimensions: p.Dimensions;
   readonly cells: Cell[];
   readonly links: Links;
 }
 
-type Links = Record<Index, Index[] | undefined>;
+type Links = Record<p.Index, p.Index[] | undefined>;
 
-export const makeGrid = (d: Dimensions): Grid => {
+export const makeGrid = (d: p.Dimensions): Grid => {
   return {
     dimensions: d,
     cells: [...Array(d[0] * d[1])].map((_, i) => makeCell(d, i)),
@@ -30,8 +24,8 @@ export const makeGrid = (d: Dimensions): Grid => {
   };
 };
 
-const makeCell = (d: Dimensions, index: Index): Cell => {
-  const pos = unsafePositionFromIndex(d)(index);
+const makeCell = (d: p.Dimensions, index: p.Index): Cell => {
+  const pos = p.unsafePositionFromIndex(d)(index);
   return {
     index,
     pos,
@@ -39,23 +33,33 @@ const makeCell = (d: Dimensions, index: Index): Cell => {
   };
 };
 
-type ChangeLink = (from: Index, to: Index) => (links: Links) => Links;
-type FoldCell = (g: Grid, c: Cell, i?: Index, src?: Cell[]) => Grid;
+type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
+type FoldCell = (g: Grid, c: Cell, i?: p.Index, src?: Cell[]) => Grid;
 type FoldCells = (f: FoldCell) => (g: Grid) => Grid;
 
 export const foldCells: FoldCells = (f) => (g) => g.cells.reduce(f, g);
 
-export const linksTo = (g: Grid, a: Position, b: Position): boolean =>
+export const linksTo = (g: Grid, a: p.Position, b: p.Position): boolean =>
   withIndexes(g, a, b, false, (ia, ib) => (g.links[ia] ?? []).includes(ib));
 
-export const linkCells = (g: Grid, a: Position, b: Position): Grid =>
+export const areNeighbors = (a: Cell, b: Cell): boolean =>
+  isNeighborOf(a, b) && isNeighborOf(b, a);
+
+const isNeighborOf = (cell: Cell, candidate: Cell): boolean =>
+  !!n.toArray(cell.neighbors).find(p.isEqual(candidate.pos));
+
+export const linkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
   withIndexes(g, a, b, g, (ia, ib) => {
+    if (!areNeighbors(g.cells[ia], g.cells[ib])) {
+      return g;
+    }
+
     const fwd = addLink(ia, ib);
     const bwd = addLink(ib, ia);
     return { ...g, links: bwd(fwd(g.links)) };
   });
 
-export const unlinkCells = (g: Grid, a: Position, b: Position): Grid =>
+export const unlinkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
   withIndexes(g, a, b, g, (ia, ib) => {
     const fwd = removeLink(ia, ib);
     const bwd = removeLink(ib, ia);
@@ -77,13 +81,13 @@ const removeLink: ChangeLink = (from, to) => (links) => {
 // this is just applicative
 const withIndexes = <T>(
   g: Grid,
-  a: Position,
-  b: Position,
+  a: p.Position,
+  b: p.Position,
   fallback: T,
-  f: (ia: Index, ib: Index) => T
+  f: (ia: p.Index, ib: p.Index) => T
 ): T => {
-  const p = positionToIndex(g.dimensions);
-  const oa = p(a);
-  const ob = p(b);
+  const toIndex = p.positionToIndex(g.dimensions);
+  const oa = toIndex(a);
+  const ob = toIndex(b);
   return isSome(oa) && isSome(ob) ? f(oa.value, ob.value) : fallback;
 };

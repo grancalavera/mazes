@@ -39,7 +39,7 @@ const scenarios: Scenario[] = [
   },
 ];
 
-fdescribe.each(scenarios)("Neighbors.toList", (scenario) => {
+describe.each(scenarios)("Neighbors.toList", (scenario) => {
   const { name, input, expected } = scenario;
   const actual = n.toArray(input);
   it(name, () => {
