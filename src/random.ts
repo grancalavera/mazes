@@ -1,3 +1,5 @@
-type Int = number;
+type CoinFlip = () => boolean;
 
-const randomInt = (min: Int, max: Int): Int => 0;
+export const coinFlip: CoinFlip = () => {
+  return Math.random() < 0.5;
+};
