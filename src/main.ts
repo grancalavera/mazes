@@ -1,2 +1,3 @@
-import { makeGrid } from "./grid";
-console.log(JSON.stringify(makeGrid([2, 2]), null, 2));
+import { randomBinaryTree } from "./binary-tree";
+
+console.log(JSON.stringify(randomBinaryTree([4, 4]), null, 2));

@@ -2,13 +2,13 @@ import * as n from "./neighbors";
 import * as p from "./plane";
 import { isSome } from "./option";
 
-interface Cell {
+export interface Cell {
   readonly index: p.Index;
   readonly pos: p.Position;
   readonly neighbors: n.Neighbors;
 }
 
-interface Grid {
+export interface Grid {
   readonly dimensions: p.Dimensions;
   readonly cells: Cell[];
   readonly links: Links;
@@ -47,6 +47,17 @@ export const areNeighbors = (a: Cell, b: Cell): boolean =>
 
 const isNeighborOf = (cell: Cell, candidate: Cell): boolean =>
   !!n.toArray(cell.neighbors).find(p.isEqual(candidate.pos));
+
+const carve = (direction: n.Direction) => (grid: Grid, cell: Cell): Grid => {
+  const from = cell.pos;
+  const to = cell.neighbors[direction];
+  return isSome(to) ? linkCells(grid, from, to.value) : grid;
+};
+
+export const carveNorth = carve("north");
+export const carveSouth = carve("south");
+export const carveEast = carve("east");
+export const carveWest = carve("west");
 
 export const linkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
   withIndexes(g, a, b, g, (ia, ib) => {

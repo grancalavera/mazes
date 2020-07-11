@@ -1,9 +1,9 @@
-type Coin = () => boolean;
-type CoinFlip = (flip: Coin) => () => boolean;
-type UnfairCoin = Coin;
-type FairCoin = Coin;
+export type Coin = () => boolean;
+export type CoinFlip = (flip: Coin) => () => boolean;
+export type UnfairCoin = Coin;
+export type FairCoin = Coin;
 
 export const fairCoin: FairCoin = () => Math.random() < 0.5;
-export const headsCoin: UnfairCoin = () => false;
-export const tailsCoin: UnfairCoin = () => true;
+export const falseCoin: UnfairCoin = () => false;
+export const trueCoin: UnfairCoin = () => true;
 export const coinFlip: CoinFlip = (flip) => () => flip();
