@@ -1,5 +1,6 @@
 import * as n from "./neighbors";
 import * as p from "./plane";
+import { replicate } from "./replicate";
 import { isSome } from "./option";
 
 export interface Cell {
@@ -55,9 +56,6 @@ const makeCell = (d: p.Dimensions, index: p.Index): Cell => {
     neighbors: n.neighbors(d)(pos),
   };
 };
-
-export const linksTo = (g: Grid, a: p.Position, b: p.Position): boolean =>
-  withIndexes(g, a, b, false, (ia, ib) => (g.links[ia] ?? []).includes(ib));
 
 export const areNeighbors = (a: Cell, b: Cell): boolean =>
   isNeighborOf(a, b) && isNeighborOf(b, a);
@@ -119,67 +117,36 @@ const withIndexes = <T>(
   return isSome(oa) && isSome(ob) ? f(oa.value, ob.value) : fallback;
 };
 
-export const print = (g: Grid): string =>
-  g.cells
-    .map(({ pos: [r, c], neighbors }) => {
-      const newline = n.hasEastNeighbor(neighbors) ? "" : "\n";
-      return `(${r},${c})${newline}`;
-    })
-    .join("");
+export const linksTo = (g: Grid, a: p.Position, b: p.Position): boolean =>
+  withIndexes(g, a, b, false, (ia, ib) => (g.links[ia] ?? []).includes(ib));
 
-/*
-+---+---+
-|000|000|
-+---+---+
-|000|000|
-+---+---+
+const hasLinkAt = (dir: n.Direction) => (g: Grid, c: Cell): boolean => {
+  const here = c.pos;
+  const there = n.walk(dir)(here);
+  return linksTo(g, here, there);
+};
 
-blank
-000000000;
-000000000;
-000000000;
-000000000;
-000000000;
+const hasLinkAtNorth = hasLinkAt("north");
+const hasLinkAtSouth = hasLinkAt("south");
+const hasLinkAtEast = hasLinkAt("east");
+const hasLinkAtWest = hasLinkAt("west");
 
-top
-+---+---0;
-000000000;
-000000000;
-000000000;
-000000000;
+export const print = (g: Grid): string => {
+  let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
+  rows(g)
+    .reverse()
+    .forEach((row) => {
+      let top = "|";
+      let bottom = "+";
+      row.forEach((cell) => {
+        const body = "   ";
+        const eastBoundary = hasLinkAtEast(g, cell) ? " " : "|";
+        top += body + eastBoundary;
+        const southBoundary = hasLinkAtSouth(g, cell) ? "   " : "---";
+        bottom += southBoundary + "+";
+      });
+      output += top + "\n" + bottom + "\n";
+    });
 
-right
-00000000+;
-00000000|;
-00000000+;
-00000000|;
-000000000;
-
-(0,0)
-000000000;
-000000000;
-000000000;
-|00000000;
-+---00000;
-
-(0,1)
-000000000;
-000000000;
-000000000;
-0000|0000;
-0000+---0;
-
-(1,0)
-000000000;
-|00000000;
-*---00000;
-000000000;
-000000000;
-
-(1,1)
-000000000;
-0000|0000;
-0000*---0;
-000000000;
-000000000;
-*/
+  return output;
+};

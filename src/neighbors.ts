@@ -35,7 +35,9 @@ export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
   };
 };
 
-const findNeighborAt = (d: Dimensions, p: Position) => (walk: Walk): Option<Position> => {
+const findNeighborAt = (d: Dimensions, p: Position) => (
+  walk: Walk
+): Option<Position> => {
   const candidate = walk(p);
   return isValidPosition(d)(candidate) ? some(candidate) : none;
 };
@@ -47,7 +49,24 @@ export const hasSouthNeighbor = hasNeighborAt("south");
 export const hasWestNeighbor = hasNeighborAt("west");
 
 type Walk = (p: Position) => Position;
-const walkNorth: Walk = ([row, col]) => [row + 1, col];
-const walkSouth: Walk = ([row, col]) => [row - 1, col];
-const walkEast: Walk = ([row, col]) => [row, col + 1];
-const walkWest: Walk = ([row, col]) => [row, col - 1];
+
+export const walk = (d: Direction) => ([row, col]: Position): Position => {
+  switch (d) {
+    case "east":
+      return [row, col + 1];
+    case "north":
+      return [row + 1, col];
+    case "south":
+      return [row - 1, col];
+    case "west":
+      return [row, col - 1];
+    default:
+      const never: never = d;
+      throw new Error(`unkown direction ${never}`);
+  }
+};
+
+const walkNorth: Walk = walk("north");
+const walkSouth: Walk = walk("south");
+const walkEast: Walk = walk("east");
+const walkWest: Walk = walk("west");
