@@ -17,13 +17,22 @@ export interface Grid {
 type FoldCell<T> = (acc: T, c: Cell, i?: p.Index, src?: Cell[]) => T;
 type FoldCells = <T>(f: FoldCell<T>, seed: T) => (g: Grid) => T;
 
-type FoldRows = <T>(f: (g: T, c: Row) => T, seed: T) => (g: Grid) => T;
-
 export const foldCells: FoldCells = <T>(f: FoldCell<T>, seed: T) => (g) =>
   g.cells.reduce(f, seed);
 
 export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid =>
   foldCells(f, g)(g);
+
+export const rows = foldCells<Row[]>((rs, c) => {
+  const {
+    pos: [rowIndex, colIndex],
+  } = c;
+
+  const row = rs[rowIndex] ?? [];
+  row[colIndex] = c;
+  rs[rowIndex] = row;
+  return rs;
+}, []);
 
 type Links = Record<p.Index, p.Index[] | undefined>;
 type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
@@ -84,13 +93,6 @@ export const unlinkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
     const bwd = removeLink(ib, ia);
     return { ...g, links: bwd(fwd(g.links)) };
   });
-
-export const rows = (g: Grid): Row[] => {
-  throw new Error("ka-boom!");
-  // return foldCells<Row[]>((rs, cell) => {
-  //   return rs;
-  // })([])();
-};
 
 const addLink: ChangeLink = (from, to) => (links) => {
   const linkSet = new Set([...(links[from] ?? []), to]);

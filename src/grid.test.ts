@@ -36,10 +36,11 @@ describe("Grid.linkCells", () => {
 });
 
 describe("Grid.rows", () => {
-  const g = makeGrid([2, 2]);
+  const g = makeGrid([3, 3]);
   const expected = [
-    [g.cells[0], g.cells[1]],
-    [g.cells[2], g.cells[3]],
+    [g.cells[0], g.cells[1], g.cells[2]],
+    [g.cells[3], g.cells[4], g.cells[5]],
+    [g.cells[6], g.cells[7], g.cells[8]],
   ];
 
   it("returns the rows from a grid", () => {
