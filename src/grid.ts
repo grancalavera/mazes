@@ -15,6 +15,10 @@ export interface Grid {
 }
 
 type Links = Record<p.Index, p.Index[] | undefined>;
+type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
+type FoldCell = (g: Grid, c: Cell, i?: p.Index, src?: Cell[]) => Grid;
+type FoldCells = (f: FoldCell) => (g: Grid) => Grid;
+type Row = Cell[];
 
 export const makeGrid = (d: p.Dimensions): Grid => {
   return {
@@ -32,10 +36,6 @@ const makeCell = (d: p.Dimensions, index: p.Index): Cell => {
     neighbors: n.neighbors(d)(pos),
   };
 };
-
-type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
-type FoldCell = (g: Grid, c: Cell, i?: p.Index, src?: Cell[]) => Grid;
-type FoldCells = (f: FoldCell) => (g: Grid) => Grid;
 
 export const foldCells: FoldCells = (f) => (g) => g.cells.reduce(f, g);
 
@@ -77,6 +77,10 @@ export const unlinkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
     return { ...g, links: bwd(fwd(g.links)) };
   });
 
+export const rows = (g: Grid): Row[] => {
+  throw new Error("rows not implemented");
+};
+
 const addLink: ChangeLink = (from, to) => (links) => {
   const linkSet = new Set([...(links[from] ?? []), to]);
   return { ...links, [from]: Array.from(linkSet) };
@@ -89,7 +93,6 @@ const removeLink: ChangeLink = (from, to) => (links) => {
   };
 };
 
-// this is just applicative
 const withIndexes = <T>(
   g: Grid,
   a: p.Position,

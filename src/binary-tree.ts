@@ -23,26 +23,26 @@ const cellAction: CellAction = (cell) => {
 };
 
 export const binaryTree: BinaryTree = (coin) => (dimensions) => {
-  const grid = g.makeGrid(dimensions);
-  const flip = r.coinFlip(coin);
+  const flipCoin = r.coinFlip(coin);
 
-  return g.foldCells((gr, cs) => {
-    const action = cellAction(cs);
+  return g.foldCells((grid, cell) => {
+    const action = cellAction(cell);
+
     switch (action) {
       case "CarveNorth":
-        return g.carveNorth(gr, cs);
+        return g.carveNorth(grid, cell);
       case "CarveEast":
-        return g.carveEast(gr, cs);
+        return g.carveEast(grid, cell);
       case "FlipCoin":
-        return flip() ? g.carveEast(gr, cs) : g.carveNorth(gr, cs);
+        return flipCoin() ? g.carveEast(grid, cell) : g.carveNorth(grid, cell);
       case "DoNothing":
-        return gr;
+        return grid;
       default: {
         const never: never = action;
         throw new Error(`unknown action ${never}`);
       }
     }
-  })(grid);
+  })(g.makeGrid(dimensions));
 };
 
 export const randomBinaryTree = binaryTree(r.fairCoin);
