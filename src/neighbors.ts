@@ -35,9 +35,7 @@ export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
   };
 };
 
-const findNeighborAt = (d: Dimensions, p: Position) => (
-  walk: Walk
-): Option<Position> => {
+const findNeighborAt = (d: Dimensions, p: Position) => (walk: Walk): Option<Position> => {
   const candidate = walk(p);
   return isValidPosition(d)(candidate) ? some(candidate) : none;
 };
@@ -62,7 +60,7 @@ export const walk = (d: Direction) => ([row, col]: Position): Position => {
       return [row, col - 1];
     default:
       const never: never = d;
-      throw new Error(`unkown direction ${never}`);
+      throw new Error(`unknown direction ${never}`);
   }
 };
 
