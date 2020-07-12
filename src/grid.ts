@@ -14,11 +14,21 @@ export interface Grid {
   readonly links: Links;
 }
 
+type FoldCell<T> = (acc: T, c: Cell, i?: p.Index, src?: Cell[]) => T;
+type FoldCells = <T>(f: FoldCell<T>, seed: T) => (g: Grid) => T;
+
+type FoldRows = <T>(f: (g: T, c: Row) => T, seed: T) => (g: Grid) => T;
+
+export const foldCells: FoldCells = <T>(f: FoldCell<T>, seed: T) => (g) =>
+  g.cells.reduce(f, seed);
+
+export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid =>
+  foldCells(f, g)(g);
+
 type Links = Record<p.Index, p.Index[] | undefined>;
 type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
-type FoldCell = (g: Grid, c: Cell, i?: p.Index, src?: Cell[]) => Grid;
-type FoldCells = (f: FoldCell) => (g: Grid) => Grid;
-type Row = Cell[];
+
+export type Row = Cell[];
 
 export const makeGrid = (d: p.Dimensions): Grid => {
   return {
@@ -36,8 +46,6 @@ const makeCell = (d: p.Dimensions, index: p.Index): Cell => {
     neighbors: n.neighbors(d)(pos),
   };
 };
-
-export const foldCells: FoldCells = (f) => (g) => g.cells.reduce(f, g);
 
 export const linksTo = (g: Grid, a: p.Position, b: p.Position): boolean =>
   withIndexes(g, a, b, false, (ia, ib) => (g.links[ia] ?? []).includes(ib));
@@ -78,7 +86,10 @@ export const unlinkCells = (g: Grid, a: p.Position, b: p.Position): Grid =>
   });
 
 export const rows = (g: Grid): Row[] => {
-  throw new Error("rows not implemented");
+  throw new Error("ka-boom!");
+  // return foldCells<Row[]>((rs, cell) => {
+  //   return rs;
+  // })([])();
 };
 
 const addLink: ChangeLink = (from, to) => (links) => {

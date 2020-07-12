@@ -25,7 +25,7 @@ const cellAction: CellAction = (cell) => {
 export const binaryTree: BinaryTree = (coin) => (dimensions) => {
   const flipCoin = r.coinFlip(coin);
 
-  return g.foldCells((grid, cell) => {
+  return g.foldGridByCell((grid, cell) => {
     const action = cellAction(cell);
 
     switch (action) {
@@ -42,7 +42,7 @@ export const binaryTree: BinaryTree = (coin) => (dimensions) => {
         throw new Error(`unknown action ${never}`);
       }
     }
-  })(g.makeGrid(dimensions));
+  }, g.makeGrid(dimensions));
 };
 
 export const randomBinaryTree = binaryTree(r.fairCoin);

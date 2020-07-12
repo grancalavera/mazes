@@ -1,4 +1,4 @@
-import { makeGrid, linkCells, linksTo, unlinkCells } from "./grid";
+import { makeGrid, linkCells, linksTo, unlinkCells, Row, rows } from "./grid";
 import { Position } from "./plane";
 
 describe("Grid.linkCells", () => {
@@ -32,5 +32,18 @@ describe("Grid.linkCells", () => {
     const j = makeGrid([2, 2]);
     const l = linkCells(j, x, y);
     expect(linksTo(l, x, y)).toBe(false);
+  });
+});
+
+describe("Grid.rows", () => {
+  const g = makeGrid([2, 2]);
+  const expected = [
+    [g.cells[0], g.cells[1]],
+    [g.cells[2], g.cells[3]],
+  ];
+
+  it("returns the rows from a grid", () => {
+    const actual = rows(g);
+    expect(actual).toEqual(expected);
   });
 });
