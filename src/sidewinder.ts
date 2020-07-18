@@ -3,7 +3,7 @@ import * as r from "./random";
 import * as p from "./plane";
 import * as n from "./neighbors";
 
-type Action = "CarveEast" | "CarveNorth" | "ChooseCell" | "DoNothing";
+type Action = "CarveNorth" | "CarveEast" | "DoNothing" | "FlipCoin";
 
 type CellAction = (cell: g.Cell) => Action;
 
