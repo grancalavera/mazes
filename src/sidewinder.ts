@@ -19,7 +19,9 @@ type Sidewinder = (
 export const sidewinder: Sidewinder = (coin, choice) => (dimensions) => {
   const flipCoin = r.coinFlip(coin);
   const choose = r.choose(choice);
-  return g.foldGridByRow((g) => g, g.makeGrid(dimensions));
+  return g.foldGridByRow((grid, row) => {
+    return grid;
+  }, g.makeGrid(dimensions));
 };
 
 export const randomSidewinder = sidewinder(r.fairCoin, r.fairChoice);
