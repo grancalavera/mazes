@@ -16,12 +16,19 @@ export interface Grid {
 }
 
 type FoldCell<T> = (acc: T, c: Cell, i?: p.Index, src?: Cell[]) => T;
+type FoldRow<T> = (acc: T, r: Row, i?: p.Index, src?: Row[]) => T;
+
 type FoldCells = <T>(f: FoldCell<T>, seed: T) => (g: Grid) => T;
+type FoldRows = <T>(f: FoldRow<T>, seed: T) => (g: Grid) => T;
 
 export const foldCells: FoldCells = <T>(f: FoldCell<T>, seed: T) => (g) =>
   g.cells.reduce(f, seed);
 
+export const foldRows: FoldRows = <T>(f: FoldRow<T>, seed: T) => (g) =>
+  rows(g).reduce(f, seed);
+
 export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid => foldCells(f, g)(g);
+export const foldGridByRow = (f: FoldRow<Grid>, g: Grid): Grid => foldRows(f, g)(g);
 
 export const rows = foldCells<Row[]>((rs, c) => {
   const {
