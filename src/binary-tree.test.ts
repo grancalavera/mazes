@@ -28,7 +28,7 @@ const horizontalGrid: g.Grid = {
   },
 };
 
-describe("binary tree algoritm", () => {
+describe("binary tree algorithm", () => {
   it("unfair false coin", () => {
     const actual = verticalBinaryTree([2, 2]);
     expect(actual).toEqual(verticalGrid);
