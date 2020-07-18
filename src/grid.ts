@@ -21,8 +21,7 @@ type FoldCells = <T>(f: FoldCell<T>, seed: T) => (g: Grid) => T;
 export const foldCells: FoldCells = <T>(f: FoldCell<T>, seed: T) => (g) =>
   g.cells.reduce(f, seed);
 
-export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid =>
-  foldCells(f, g)(g);
+export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid => foldCells(f, g)(g);
 
 export const rows = foldCells<Row[]>((rs, c) => {
   const {

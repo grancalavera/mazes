@@ -5,4 +5,4 @@ setInterval(() => {
   const myMaze = randomBinaryTree([15, 15]);
   console.clear();
   console.log(print(myMaze));
-}, 500);
+}, 200);
