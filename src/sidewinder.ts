@@ -5,6 +5,12 @@ import * as n from "./neighbors";
 
 type Action = "CarveEast" | "CarveNorth" | "ChooseCell" | "DoNothing";
 
+type CellAction = (cell: g.Cell) => Action;
+
+const cellAction: CellAction = (cell) => {
+  throw new Error("cellAction not implemented");
+};
+
 type Sidewinder = (
   coin: r.Coin,
   choice: r.Choice
