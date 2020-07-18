@@ -6,13 +6,10 @@ export type UnfairCoin = Coin;
 export type FairCoin = Coin;
 export type MemoryCoin = Coin;
 
-export type Choice = <T>(xs: T[]) => Option<T>;
-export type ChooseFirst = Choice;
-export type ChooseLast = Choice;
-
 export const fairCoin: FairCoin = () => Math.random() < 0.5;
 export const falseCoin: UnfairCoin = () => false;
 export const trueCoin: UnfairCoin = () => true;
+
 export const coinFlip: CoinFlip = (flip) => () => flip();
 
 export const memoryCoin = (start: boolean, remembers: number = 2): MemoryCoin => {
@@ -31,6 +28,13 @@ export const memoryCoin = (start: boolean, remembers: number = 2): MemoryCoin =>
     return result;
   };
 };
+
+export type Choice = <T>(xs: T[]) => Option<T>;
+export type ChooseFirst = Choice;
+export type ChooseLast = Choice;
+export type Choose = <T>(choice: (xs: T[]) => Option<T>) => (options: T[]) => Option<T>;
+
+export const choose: Choose = (f) => (l) => f(l);
 
 export const fairChoice: Choice = (xs) => {
   if (xs.length === 0) {

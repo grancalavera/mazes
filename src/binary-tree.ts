@@ -1,12 +1,12 @@
-import * as sw from "./grid";
+import * as g from "./grid";
 import * as r from "./random";
 import * as p from "./plane";
 import * as n from "./neighbors";
 
-type BinaryTree = (coin: r.Coin) => (dimension: p.Dimensions) => sw.Grid;
+type BinaryTree = (coin: r.Coin) => (dimension: p.Dimensions) => g.Grid;
 type Action = "CarveNorth" | "CarveEast" | "DoNothing" | "FlipCoin";
 
-type CellAction = (cell: sw.Cell) => Action;
+type CellAction = (cell: g.Cell) => Action;
 
 const cellAction: CellAction = (cell) => {
   const { neighbors } = cell;
@@ -25,16 +25,16 @@ const cellAction: CellAction = (cell) => {
 export const binaryTree: BinaryTree = (coin) => (dimensions) => {
   const flipCoin = r.coinFlip(coin);
 
-  return sw.foldGridByCell((grid, cell) => {
+  return g.foldGridByCell((grid, cell) => {
     const action = cellAction(cell);
 
     switch (action) {
       case "CarveNorth":
-        return sw.carveNorth(grid, cell);
+        return g.carveNorth(grid, cell);
       case "CarveEast":
-        return sw.carveEast(grid, cell);
+        return g.carveEast(grid, cell);
       case "FlipCoin":
-        return flipCoin() ? sw.carveEast(grid, cell) : sw.carveNorth(grid, cell);
+        return flipCoin() ? g.carveEast(grid, cell) : g.carveNorth(grid, cell);
       case "DoNothing":
         return grid;
       default: {
@@ -42,7 +42,7 @@ export const binaryTree: BinaryTree = (coin) => (dimensions) => {
         throw new Error(`unknown action ${never}`);
       }
     }
-  }, sw.makeGrid(dimensions));
+  }, g.makeGrid(dimensions));
 };
 
 export const randomBinaryTree = binaryTree(r.fairCoin);
