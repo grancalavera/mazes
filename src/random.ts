@@ -1,4 +1,4 @@
-import { Option, none, some } from "./option";
+import { none, Option, some } from "./option";
 
 export type Coin = () => boolean;
 export type CoinFlip = (flip: Coin) => () => boolean;
@@ -32,7 +32,7 @@ export const memoryCoin = (start: boolean, remembers: number = 2): MemoryCoin =>
   };
 };
 
-export const choice: Choice = (xs) => {
+export const fairChoice: Choice = (xs) => {
   if (xs.length === 0) {
     return none;
   }
