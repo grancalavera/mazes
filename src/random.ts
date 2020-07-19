@@ -2,17 +2,14 @@ import { NonEmptyArray } from "./non-empty-array";
 
 export type Coin = () => boolean;
 export type CoinFlip = (flip: Coin) => () => boolean;
-export type UnfairCoin = Coin;
-export type FairCoin = Coin;
-export type MemoryCoin = Coin;
 
-export const fairCoin: FairCoin = () => Math.random() < 0.5;
-export const falseCoin: UnfairCoin = () => false;
-export const trueCoin: UnfairCoin = () => true;
+export const fairCoin: Coin = () => Math.random() < 0.5;
+export const falseCoin: Coin = () => false;
+export const trueCoin: Coin = () => true;
 
 export const coinFlip: CoinFlip = (flip) => () => flip();
 
-export const memoryCoin = (start: boolean, remembers: number = 2): MemoryCoin => {
+export const memoryCoin = (start: boolean, remembers: number = 2): Coin => {
   let next = start;
   let count = 0;
 
