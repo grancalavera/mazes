@@ -1,12 +1,11 @@
 import { NonEmptyArray } from "./non-empty-array";
 
 export type Coin = () => boolean;
-export type CoinFlip = (flip: Coin) => () => boolean;
+export type CoinFlip = (f: Coin) => () => boolean;
 
 export const fairCoin: Coin = () => Math.random() < 0.5;
 export const falseCoin: Coin = () => false;
 export const trueCoin: Coin = () => true;
-
 export const coinFlip: CoinFlip = (flip) => () => flip();
 
 export const memoryCoin = (start: boolean, remembers: number = 2): Coin => {
@@ -15,7 +14,7 @@ export const memoryCoin = (start: boolean, remembers: number = 2): Coin => {
 
   return () => {
     if (remembers < 0) {
-      throw new Error("remembers must be an integer or zero");
+      throw new Error("remembers must be a positive integer or zero");
     }
 
     const result = next;
@@ -27,9 +26,7 @@ export const memoryCoin = (start: boolean, remembers: number = 2): Coin => {
 };
 
 export type Choice = <T>(xs: NonEmptyArray<T>) => T;
-export type Choose = <T>(
-  choice: (xs: NonEmptyArray<T>) => T
-) => (options: NonEmptyArray<T>) => T;
+export type Choose = <T>(f: (xs: NonEmptyArray<T>) => T) => (xs: NonEmptyArray<T>) => T;
 
 export const choose: Choose = (f) => (l) => f(l);
 export const fairChoice: Choice = (xs) => xs[getRandomInt(0, xs.length - 1)];
