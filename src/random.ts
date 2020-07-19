@@ -1,4 +1,4 @@
-import { none, Option, some } from "./option";
+import { NonEmptyArray } from "./non-empty-array";
 
 export type Coin = () => boolean;
 export type CoinFlip = (flip: Coin) => () => boolean;
@@ -29,30 +29,15 @@ export const memoryCoin = (start: boolean, remembers: number = 2): MemoryCoin =>
   };
 };
 
-export type Choice = <T>(xs: T[]) => Option<T>;
-export type ChooseFirst = Choice;
-export type ChooseLast = Choice;
-export type Choose = <T>(choice: (xs: T[]) => Option<T>) => (options: T[]) => Option<T>;
+export type Choice = <T>(xs: NonEmptyArray<T>) => T;
+export type Choose = <T>(
+  choice: (xs: NonEmptyArray<T>) => T
+) => (options: NonEmptyArray<T>) => T;
 
 export const choose: Choose = (f) => (l) => f(l);
-
-export const fairChoice: Choice = (xs) => {
-  if (xs.length === 0) {
-    return none;
-  }
-  const index = getRandomInt(0, xs.length - 1);
-  return some(xs[index]);
-};
-
-export const chooseFirst: ChooseFirst = (xs) => {
-  const [first] = xs;
-  return first === undefined ? none : some(first);
-};
-
-export const chooseLast: ChooseLast = (xs) => {
-  const last = xs[xs.length - 1];
-  return last === undefined ? none : some(last);
-};
+export const fairChoice: Choice = (xs) => xs[getRandomInt(0, xs.length - 1)];
+export const chooseFirst: Choice = (xs) => xs[0];
+export const chooseLast: Choice = (xs) => xs[xs.length - 1];
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive).
