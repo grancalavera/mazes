@@ -832,6 +832,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pngjs@npm:^3.4.2":
+  version: 3.4.2
+  resolution: "@types/pngjs@npm:3.4.2"
+  dependencies:
+    "@types/node": "*"
+  checksum: 363cfafb757ee9e7e28fce5081f31cf7784694c37e805125fb7fe33cab20a2c6be840f9e17d52f1026ff7d8f053ab69fd673b042add37eece7d606dc53e614a5
+  languageName: node
+  linkType: hard
+
 "@types/prettier@npm:^2.0.0":
   version: 2.0.1
   resolution: "@types/prettier@npm:2.0.1"
@@ -4111,9 +4120,11 @@ __metadata:
   dependencies:
     "@types/jest": ^26.0.3
     "@types/node": ^14.0.14
+    "@types/pngjs": ^3.4.2
     "@yarnpkg/pnpify": ^2.0.0-rc.25
     jest: ^26.1.0
     nodemon: ^2.0.4
+    pngjs: ^5.0.0
     ts-jest: ^26.1.1
     ts-node: ^8.10.2
     typescript: ^3.9.5
@@ -4809,6 +4820,13 @@ __metadata:
   version: 7.0.0
   resolution: "pluralize@npm:7.0.0"
   checksum: d35d8aeda1eb2f81123131e76ed0f2f48d681abfa4c46e4c6fdd6dca622650c8bd531aa0c5a3c7f779bd9660d08ceb51660e1f55def4bd14328ecfa76fe69962
+  languageName: node
+  linkType: hard
+
+"pngjs@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "pngjs@npm:5.0.0"
+  checksum: 2b8d7eeafd947449b7dc3908e1a983d366a7c98ea01f44e9b42a9608f60faa6667f55b342739746ead810d6909e8fd0d994f0a59502d43f39d93e85214259652
   languageName: node
   linkType: hard
 
