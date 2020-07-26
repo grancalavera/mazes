@@ -1,15 +1,6 @@
 import * as g from "./grid";
 import * as r from "./random";
 import * as p from "./plane";
-import * as n from "./neighbors";
-
-type Action = "CarveNorth" | "CarveEast" | "DoNothing" | "FlipCoin";
-
-type CellAction = (cell: g.Cell) => Action;
-
-const cellAction: CellAction = (cell) => {
-  throw new Error("cellAction not implemented");
-};
 
 type Sidewinder = (
   coin: r.Coin,
