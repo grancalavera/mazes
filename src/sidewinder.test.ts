@@ -1,6 +1,5 @@
-import * as sw from "./sidewinder";
-import * as g from "./grid";
 import * as r from "./random";
+import * as sw from "./sidewinder";
 import { maze1, maze2 } from "./sidewinder-fixtures";
 
 const coin = r.memoryCoin(true, 1);
