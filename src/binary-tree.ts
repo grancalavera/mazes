@@ -2,7 +2,7 @@ import * as g from "./grid";
 import * as r from "./random";
 import * as p from "./plane";
 import * as n from "./neighbors";
-import { cellAction } from "./cellAction";
+import * as c from "./cell-action";
 
 type BinaryTree = (coin: r.Coin) => (dimension: p.Dimensions) => g.Grid;
 
@@ -10,7 +10,7 @@ export const binaryTree: BinaryTree = (coin) => (dimensions) => {
   const flipCoin = r.coinFlip(coin);
 
   return g.foldGridByCell((grid, cell) => {
-    const action = cellAction(cell);
+    const action = c.cellAction(cell);
 
     switch (action) {
       case "CarveNorth":
