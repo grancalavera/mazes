@@ -30,16 +30,17 @@ export const foldRows: FoldRows = <T>(f: FoldRow<T>, seed: T) => (g) =>
 export const foldGridByCell = (f: FoldCell<Grid>, g: Grid): Grid => foldCells(f, g)(g);
 export const foldGridByRow = (f: FoldRow<Grid>, g: Grid): Grid => foldRows(f, g)(g);
 
-export const rows = foldCells<Row[]>((rs, c) => {
-  const {
-    pos: [rowIndex, colIndex],
-  } = c;
+export const rows = (g: Grid) =>
+  foldCells<Row[]>((rs, c) => {
+    const {
+      pos: [rowIndex, colIndex],
+    } = c;
 
-  const row = rs[rowIndex] ?? [];
-  row[colIndex] = c;
-  rs[rowIndex] = row;
-  return rs;
-}, []);
+    const row = rs[rowIndex] ?? [];
+    row[colIndex] = c;
+    rs[rowIndex] = row;
+    return rs;
+  }, [])(g);
 
 type Links = Record<p.Index, p.Index[] | undefined>;
 type ChangeLink = (from: p.Index, to: p.Index) => (links: Links) => Links;
