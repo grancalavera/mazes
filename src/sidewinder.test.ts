@@ -2,9 +2,8 @@ import * as r from "./random";
 import * as sw from "./sidewinder";
 import { maze1, maze2 } from "./sidewinder-fixtures";
 
-const coin = r.memoryCoin(true, 1);
-const sidewinder1 = sw.sidewinder(coin, r.chooseFirst);
-const sidewinder2 = sw.sidewinder(coin, r.chooseLast);
+const sidewinder1 = sw.sidewinder(r.memoryCoin(true, 1), r.chooseFirst);
+const sidewinder2 = sw.sidewinder(r.memoryCoin(true, 1), r.chooseLast);
 
 describe("sidewinder algorithm", () => {
   it("true true first", () => {

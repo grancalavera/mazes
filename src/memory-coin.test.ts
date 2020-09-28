@@ -1,6 +1,6 @@
 /*
 We want to capture the result of n subsequent coin flips, starting from
-some boolean value x and remembering such value for y coin flips, and then
+some boolean value x and remembering such value for n consecutive coin flips, and then
 alternating to the opposite boolean value, and  finally repeating the sequence
 
 For example:
@@ -15,7 +15,7 @@ Result:
 */
 
 import { isSome, none, Option, some } from "./option";
-import { memoryCoin, coinFlip } from "./random";
+import { memoryCoin } from "./random";
 import { replicate } from "./replicate";
 
 interface Scenario {

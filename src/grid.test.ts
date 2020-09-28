@@ -1,4 +1,4 @@
-import { makeGrid, linkCells, linksTo, unlinkCells, Row, rows } from "./grid";
+import { linkCells, linksTo, makeGrid, rows, unlinkCells } from "./grid";
 import { Position } from "./plane";
 
 describe("Grid.linkCells", () => {

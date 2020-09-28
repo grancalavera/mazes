@@ -1,7 +1,7 @@
 import * as n from "./neighbors";
+import { isSome } from "./option";
 import * as p from "./plane";
 import { replicate } from "./replicate";
-import { isSome } from "./option";
 
 export interface Cell {
   readonly index: p.Index;
@@ -133,13 +133,14 @@ const hasLinkAt = (dir: n.Direction) => (g: Grid, c: Cell): boolean => {
   return linksTo(g, here, there);
 };
 
-const hasLinkAtNorth = hasLinkAt("north");
-const hasLinkAtSouth = hasLinkAt("south");
-const hasLinkAtEast = hasLinkAt("east");
-const hasLinkAtWest = hasLinkAt("west");
+export const hasLinkAtNorth = hasLinkAt("north");
+export const hasLinkAtSouth = hasLinkAt("south");
+export const hasLinkAtEast = hasLinkAt("east");
+export const hasLinkAtWest = hasLinkAt("west");
 
 export const print = (g: Grid): string => {
   let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
+
   rows(g)
     .reverse()
     .forEach((row) => {

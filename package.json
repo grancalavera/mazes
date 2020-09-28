@@ -4,7 +4,7 @@
   "main": "build/main.js",
   "scripts": {
     "start:parcel": "parcel src/index.html",
-    "start:typecheck": "tsc --noEmit",
+    "start:typecheck": "tsc --noEmit -w",
     "start": "concurrently yarn:start:*",
     "test": "jest"
   },
