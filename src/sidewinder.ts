@@ -3,6 +3,7 @@ import * as r from "./random";
 import * as p from "./plane";
 import * as c from "./cell-action";
 import { isNonEmptyArray } from "./non-empty-array";
+import { assertNever } from "./assert-never";
 
 type Sidewinder = (
   coin: r.Coin,
@@ -14,47 +15,41 @@ export const sidewinder: Sidewinder = (coin, choice) => (dimensions) => {
   const choose = r.choose(choice);
 
   return g.foldGridByRow((grid, row) => {
-    let newG = grid;
-    let runBeginsAt = 0;
+    let result = grid;
+    let run: g.Cell[] = [];
 
-    row.forEach((cell, index) => {
+    row.forEach((cell) => {
+      // this is an implementation detail: we need to flip the coin every time
+      // to be able to test the deterministic coins. This can be resolved by
+      // passing a list of coin flips as an argument
+      const shouldCloseOut = !flipCoin();
       const action = c.cellAction(cell);
-      const shouldCarveEast = flipCoin();
+      run.push(cell);
 
       switch (action) {
         case "CarveEast":
-          newG = g.carveEast(newG, cell);
+          result = g.carveEast(result, cell);
           break;
         case "CarveNorth":
-          newG = g.carveNorth(newG, cell);
+          result = g.carveNorth(result, cell);
           break;
-        case "FlipCoin": {
-          if (shouldCarveEast) {
-            newG = g.carveEast(newG, cell);
+        case "FlipCoin":
+          if (shouldCloseOut && isNonEmptyArray(run)) {
+            result = g.carveNorth(result, choose(run));
+            run = [];
+          } else if (shouldCloseOut) {
+            throw new Error("unexpected empty run");
           } else {
-            const runEndsAt = index + 1;
-            const rowSlice = row.slice(runBeginsAt, runEndsAt);
-
-            if (isNonEmptyArray(rowSlice)) {
-              const cellToCarve = choose(rowSlice);
-              newG = g.carveNorth(newG, cellToCarve);
-            }
-
-            runBeginsAt = index;
+            result = g.carveEast(result, cell);
           }
-
           break;
-        }
         case "DoNothing":
           break;
-        default: {
-          const never: never = action;
-          throw new Error(`unknown action ${never}`);
-        }
+        default:
+          assertNever(action);
       }
     });
-
-    return newG;
+    return result;
   }, g.makeGrid(dimensions));
 };
 

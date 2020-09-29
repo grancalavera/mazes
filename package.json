@@ -9,10 +9,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/chroma-js": "2.1.0",
     "@types/jest": "^26.0.3",
     "@types/node": "^14.0.14",
     "@types/p5": "^0.9.1",
     "@yarnpkg/pnpify": "^2.0.0-rc.25",
+    "chroma-js": "2.1.0",
     "concurrently": "5.3.0",
     "jest": "^26.1.0",
     "nodemon": "^2.0.4",

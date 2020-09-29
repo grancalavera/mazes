@@ -1,8 +1,7 @@
-import * as g from "./grid";
-import * as r from "./random";
-import * as p from "./plane";
-import * as n from "./neighbors";
 import * as c from "./cell-action";
+import * as g from "./grid";
+import * as p from "./plane";
+import * as r from "./random";
 
 type BinaryTree = (coin: r.Coin) => (dimension: p.Dimensions) => g.Grid;
 

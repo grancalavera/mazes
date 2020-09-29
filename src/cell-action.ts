@@ -1,18 +1,19 @@
 import * as g from "./grid";
-import * as n from "./neighbors";
+import { hasEastNeighbor, hasNorthNeighbor } from "./neighbors";
 
 export type Action = "CarveNorth" | "CarveEast" | "DoNothing" | "FlipCoin";
 
 export function cellAction(cell: g.Cell): Action {
   const { neighbors } = cell;
-  if (n.hasEastNeighbor(neighbors) && n.hasNorthNeighbor(neighbors)) {
+  if (hasEastNeighbor(neighbors) && hasNorthNeighbor(neighbors)) {
     return "FlipCoin";
   }
 
-  if (!n.hasEastNeighbor(neighbors) && n.hasNorthNeighbor(neighbors)) {
+  if (hasNorthNeighbor(neighbors)) {
     return "CarveNorth";
   }
-  if (n.hasEastNeighbor(neighbors) && !n.hasNorthNeighbor(neighbors)) {
+
+  if (hasEastNeighbor(neighbors)) {
     return "CarveEast";
   }
 
