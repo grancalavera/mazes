@@ -1,31 +1,34 @@
-import * as c from "./cell-action";
-import * as g from "./grid";
-import * as p from "./plane";
-import * as r from "./random";
+import { assertNever } from "./assert-never";
+import { cellAction } from "./cell-action";
+import { carveEast, carveNorth, foldGridByCell, Grid, makeGrid } from "./grid";
+import { Dimensions } from "./plane";
+import { Coin, coinFlip, fairCoin } from "./random";
 
-type BinaryTree = (coin: r.Coin) => (dimension: p.Dimensions) => g.Grid;
+type BinaryTree = (coin: Coin) => (dimension: Dimensions) => Grid;
 
 export const binaryTree: BinaryTree = (coin) => (dimensions) => {
-  const flipCoin = r.coinFlip(coin);
+  const flipCoin = coinFlip(coin);
+  const seed = makeGrid(dimensions);
 
-  return g.foldGridByCell((grid, cell) => {
-    const action = c.cellAction(cell);
+  const runAlgorithm = foldGridByCell((grid, cell) => {
+    const action = cellAction(cell);
 
     switch (action) {
       case "CarveNorth":
-        return g.carveNorth(grid, cell);
+        return carveNorth(grid, cell);
       case "CarveEast":
-        return g.carveEast(grid, cell);
+        return carveEast(grid, cell);
       case "FlipCoin":
-        return flipCoin() ? g.carveEast(grid, cell) : g.carveNorth(grid, cell);
-      case "DoNothing":
+        return flipCoin() ? carveEast(grid, cell) : carveNorth(grid, cell);
+      case "Done":
         return grid;
       default: {
-        const never: never = action;
-        throw new Error(`unknown action ${never}`);
+        assertNever(action);
       }
     }
-  }, g.makeGrid(dimensions));
+  });
+
+  return runAlgorithm(seed);
 };
 
-export const randomBinaryTree = binaryTree(r.fairCoin);
+export const randomBinaryTree = binaryTree(fairCoin);

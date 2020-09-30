@@ -1,56 +1,52 @@
-import * as g from "./grid";
-import * as r from "./random";
-import * as p from "./plane";
-import * as c from "./cell-action";
-import { isNonEmptyArray } from "./non-empty-array";
 import { assertNever } from "./assert-never";
+import { cellAction } from "./cell-action";
+import { carveEast, carveNorth, Cell, foldGridByCell, Grid, makeGrid } from "./grid";
+import { hasWestNeighbor } from "./neighbors";
+import { isNonEmptyArray } from "./non-empty-array";
+import { Dimensions } from "./plane";
+import * as random from "./random";
+import { Choice, Coin } from "./random";
 
-type Sidewinder = (
-  coin: r.Coin,
-  choice: r.Choice
-) => (dimensions: p.Dimensions) => g.Grid;
+type Sidewinder = (coin: Coin, choice: Choice) => (dimensions: Dimensions) => Grid;
 
 export const sidewinder: Sidewinder = (coin, choice) => (dimensions) => {
-  const flipCoin = r.coinFlip(coin);
-  const choose = r.choose(choice);
+  const flipCoin = random.coinFlip(coin);
+  const choose = random.choose(choice);
+  const seed = makeGrid(dimensions);
+  let runOfCells: Cell[] = [];
 
-  return g.foldGridByRow((grid, row) => {
-    let result = grid;
-    let run: g.Cell[] = [];
+  const runAlgorithm = foldGridByCell((result, cell) => {
+    // this is an implementation detail: we need to flip the coin every time
+    // to be able to test the deterministic coins. This can be resolved by
+    // passing a list of coin flips as an argument
+    const shouldCloseOut = !flipCoin();
+    const action = cellAction(cell);
+    runOfCells = hasWestNeighbor(cell.neighbors) ? runOfCells : [];
+    runOfCells.push(cell);
 
-    row.forEach((cell) => {
-      // this is an implementation detail: we need to flip the coin every time
-      // to be able to test the deterministic coins. This can be resolved by
-      // passing a list of coin flips as an argument
-      const shouldCloseOut = !flipCoin();
-      const action = c.cellAction(cell);
-      run.push(cell);
+    switch (action) {
+      case "CarveEast":
+        return carveEast(result, cell);
+      case "CarveNorth":
+        return carveNorth(result, cell);
+      case "FlipCoin":
+        if (shouldCloseOut && isNonEmptyArray(runOfCells)) {
+          const choice = choose(runOfCells);
+          runOfCells = [];
+          return carveNorth(result, choice);
+        } else if (shouldCloseOut) {
+          throw new Error("sidewinder: unexpected empty run");
+        } else {
+          return carveEast(result, cell);
+        }
+      case "Done":
+        return result;
+      default:
+        assertNever(action);
+    }
+  });
 
-      switch (action) {
-        case "CarveEast":
-          result = g.carveEast(result, cell);
-          break;
-        case "CarveNorth":
-          result = g.carveNorth(result, cell);
-          break;
-        case "FlipCoin":
-          if (shouldCloseOut && isNonEmptyArray(run)) {
-            result = g.carveNorth(result, choose(run));
-            run = [];
-          } else if (shouldCloseOut) {
-            throw new Error("unexpected empty run");
-          } else {
-            result = g.carveEast(result, cell);
-          }
-          break;
-        case "DoNothing":
-          break;
-        default:
-          assertNever(action);
-      }
-    });
-    return result;
-  }, g.makeGrid(dimensions));
+  return runAlgorithm(seed);
 };
 
-export const randomSidewinder = sidewinder(r.fairCoin, r.fairChoice);
+export const randomSidewinder = sidewinder(random.fairCoin, random.fairChoice);

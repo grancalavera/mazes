@@ -1,15 +1,15 @@
-import * as g from "./grid";
+import { Cell } from "./grid";
 import { hasEastNeighbor, hasNorthNeighbor } from "./neighbors";
 
-export type Action = "CarveNorth" | "CarveEast" | "DoNothing" | "FlipCoin";
+export type CellAction = "CarveEast" | "CarveNorth" | "FlipCoin" | "Done";
 
-export function cellAction(cell: g.Cell): Action {
+export function cellAction(cell: Cell): CellAction {
   const { neighbors } = cell;
   if (hasEastNeighbor(neighbors) && hasNorthNeighbor(neighbors)) {
     return "FlipCoin";
   }
 
-  if (hasNorthNeighbor(neighbors)) {
+  if (!hasEastNeighbor(neighbors) && hasNorthNeighbor(neighbors)) {
     return "CarveNorth";
   }
 
@@ -17,5 +17,5 @@ export function cellAction(cell: g.Cell): Action {
     return "CarveEast";
   }
 
-  return "DoNothing";
+  return "Done";
 }
