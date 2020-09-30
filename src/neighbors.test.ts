@@ -33,6 +33,8 @@ const scenarios: Scenario[] = [
     ],
     expected: n.empty,
   },
+  // (1,0,2) (1,1,3)
+  // (0,0,0) (0,1,1)
   {
     name: "2x2 plane, neighbors for (0,0)",
     input: [
@@ -40,8 +42,8 @@ const scenarios: Scenario[] = [
       [0, 0],
     ],
     expected: {
-      north: some([1, 0]),
-      east: some([0, 1]),
+      north: some([[1, 0], 2]),
+      east: some([[0, 1], 1]),
       south: none,
       west: none,
     },
@@ -53,10 +55,10 @@ const scenarios: Scenario[] = [
       [0, 1],
     ],
     expected: {
-      north: some([1, 1]),
+      north: some([[1, 1], 3]),
       east: none,
       south: none,
-      west: some([0, 0]),
+      west: some([[0, 0], 0]),
     },
   },
   {
@@ -67,8 +69,8 @@ const scenarios: Scenario[] = [
     ],
     expected: {
       north: none,
-      east: some([1, 1]),
-      south: some([0, 0]),
+      east: some([[1, 1], 3]),
+      south: some([[0, 0], 0]),
       west: none,
     },
   },
@@ -81,10 +83,13 @@ const scenarios: Scenario[] = [
     expected: {
       north: none,
       east: none,
-      south: some([0, 1]),
-      west: some([1, 0]),
+      south: some([[0, 1], 1]),
+      west: some([[1, 0], 2]),
     },
   },
+  // (2,0,6) (2,1,7) (2,2,8)
+  // (1,0,3) (1,1,4) (1,2,5)
+  // (0,0,0) (0,1,1) (0,2,2)
   {
     name: "3x3 plane, neighbors for (1,1)",
     input: [
@@ -92,10 +97,10 @@ const scenarios: Scenario[] = [
       [1, 1],
     ],
     expected: {
-      north: some([2, 1]),
-      east: some([1, 2]),
-      south: some([0, 1]),
-      west: some([1, 0]),
+      north: some([[2, 1], 7]),
+      east: some([[1, 2], 5]),
+      south: some([[0, 1], 1]),
+      west: some([[1, 0], 3]),
     },
   },
   {
@@ -105,9 +110,9 @@ const scenarios: Scenario[] = [
       [1, 0],
     ],
     expected: {
-      north: some([2, 0]),
-      east: some([1, 1]),
-      south: some([0, 0]),
+      north: some([[2, 0], 6]),
+      east: some([[1, 1], 4]),
+      south: some([[0, 0], 0]),
       west: none,
     },
   },
@@ -118,10 +123,10 @@ const scenarios: Scenario[] = [
       [1, 2],
     ],
     expected: {
-      north: some([2, 2]),
+      north: some([[2, 2], 8]),
       east: none,
-      south: some([0, 2]),
-      west: some([1, 1]),
+      south: some([[0, 2], 2]),
+      west: some([[1, 1], 4]),
     },
   },
   {
@@ -131,10 +136,10 @@ const scenarios: Scenario[] = [
       [0, 1],
     ],
     expected: {
-      north: some([1, 1]),
-      east: some([0, 2]),
+      north: some([[1, 1], 4]),
+      east: some([[0, 2], 2]),
       south: none,
-      west: some([0, 0]),
+      west: some([[0, 0], 0]),
     },
   },
   {
@@ -145,14 +150,14 @@ const scenarios: Scenario[] = [
     ],
     expected: {
       north: none,
-      east: some([2, 2]),
-      south: some([1, 1]),
-      west: some([2, 0]),
+      east: some([[2, 2], 8]),
+      south: some([[1, 1], 4]),
+      west: some([[2, 0], 6]),
     },
   },
 ];
 
-describe.each(scenarios)("neighbors", (scenario) => {
+describe.each(scenarios)("find neighbors", (scenario) => {
   const {
     name,
     input: [d, p],

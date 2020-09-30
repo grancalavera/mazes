@@ -68,12 +68,12 @@ export const areNeighbors = (a: Cell, b: Cell): boolean =>
   isNeighborOf(a, b) && isNeighborOf(b, a);
 
 const isNeighborOf = (cell: Cell, candidate: Cell): boolean =>
-  !!toArray(cell.neighbors).find(isEqual(candidate.pos));
+  !!toArray(cell.neighbors).find(([p]) => isEqual(candidate.pos)(p));
 
 const carve = (direction: Direction) => (grid: Grid, cell: Cell): Grid => {
   const from = cell.pos;
   const to = cell.neighbors[direction];
-  return isSome(to) ? linkCells(grid, from, to.value) : grid;
+  return isSome(to) ? linkCells(grid, from, to.value[0]) : grid;
 };
 
 export const carveNorth = carve("north");

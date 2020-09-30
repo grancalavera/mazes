@@ -1,5 +1,6 @@
-import { none, Option, some, isSome, fromSome } from "./option";
-import { Dimensions, isValidPosition, Position } from "./plane";
+import { assertNever } from "./assert-never";
+import { fromSome, isSome, none, Option, some } from "./option";
+import { Dimensions, Index, Position, positionToIndex } from "./plane";
 
 //   N   2
 // W x E 1
@@ -9,11 +10,13 @@ import { Dimensions, isValidPosition, Position } from "./plane";
 export type Direction = "north" | "east" | "south" | "west";
 
 export interface Neighbors {
-  readonly north: Option<Position>;
-  readonly east: Option<Position>;
-  readonly south: Option<Position>;
-  readonly west: Option<Position>;
+  readonly north: Option<Neighbor>;
+  readonly east: Option<Neighbor>;
+  readonly south: Option<Neighbor>;
+  readonly west: Option<Neighbor>;
 }
+
+export type Neighbor = [Position, Index];
 
 export const empty: Neighbors = {
   east: none,
@@ -22,11 +25,11 @@ export const empty: Neighbors = {
   west: none,
 };
 
-export const toArray = (n: Neighbors): Position[] =>
-  (Object.values(n) as Option<Position>[]).filter(isSome).map(fromSome);
+export const toArray = (n: Neighbors): Neighbor[] =>
+  (Object.values(n) as Option<Neighbor>[]).filter(isSome).map(fromSome);
 
 export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
-  const neighborAt = findNeighborAt(d, p);
+  const neighborAt = findNeighbor(d, p);
   return {
     north: neighborAt(walkNorth),
     east: neighborAt(walkEast),
@@ -35,9 +38,13 @@ export const neighbors = (d: Dimensions) => (p: Position): Neighbors => {
   };
 };
 
-const findNeighborAt = (d: Dimensions, p: Position) => (walk: Walk): Option<Position> => {
-  const candidate = walk(p);
-  return isValidPosition(d)(candidate) ? some(candidate) : none;
+const findNeighbor = (d: Dimensions, p: Position) => (walkTo: Walk): Option<Neighbor> => {
+  const candidate = walkTo(p);
+  const index = positionToIndex(d)(candidate);
+  // is enough by checking the position candidate has an index within the given dimensions
+  // if it doesn't, it means we're out of bounds and there is no neighbor in the direction
+  // we're walking
+  return isSome(index) ? some([candidate, index.value]) : none;
 };
 
 const hasNeighborAt = (d: Direction) => (n: Neighbors) => isSome(n[d]);
@@ -59,8 +66,7 @@ export const walk = (d: Direction) => ([row, col]: Position): Position => {
     case "west":
       return [row, col - 1];
     default:
-      const never: never = d;
-      throw new Error(`unknown direction ${never}`);
+      assertNever(d);
   }
 };
 
