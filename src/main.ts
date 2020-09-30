@@ -47,8 +47,15 @@ const drawMaze = (p: p5) => (offset: Position, m: Grid): void => {
 new p5((p: p5) => {
   const d = drawMaze(p);
   let elapsedFrames = 0;
-  let m1: Grid;
-  let m2: Grid;
+  let b1: Grid;
+  let b2: Grid;
+  let b3: Grid;
+  let b4: Grid;
+
+  let s1: Grid;
+  let s2: Grid;
+  let s3: Grid;
+  let s4: Grid;
 
   const frequency = 1;
   const frameRate = 1;
@@ -62,16 +69,30 @@ new p5((p: p5) => {
     p.clear();
 
     if (elapsedFrames % frequency === 0) {
-      m1 = randomBinaryTree([20, 40]);
-      m2 = randomSidewinder([20, 40]);
+      b1 = randomBinaryTree([10, 10]);
+      b2 = randomBinaryTree([10, 10]);
+      b3 = randomBinaryTree([10, 10]);
+      b4 = randomBinaryTree([10, 10]);
+
+      s1 = randomSidewinder([10, 10]);
+      s2 = randomSidewinder([10, 10]);
+      s3 = randomSidewinder([10, 10]);
+      s4 = randomSidewinder([10, 10]);
     }
 
-    d([20, 10], m1);
-    d([460, 10], m2);
+    d([20, 10], b1);
+    d([20, 240], b2);
+    d([250, 10], b3);
+    d([250, 240], b4);
+
+    d([500, 10], s1);
+    d([500, 240], s2);
+    d([730, 10], s3);
+    d([730, 240], s4);
 
     p.strokeWeight(1);
     p.text("binary tree", 10, 10);
-    p.text("sidewinder", 10, 450);
+    p.text("sidewinder", 10, 490);
 
     elapsedFrames++;
   };
