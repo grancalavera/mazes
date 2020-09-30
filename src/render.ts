@@ -1,5 +1,12 @@
 import p5 from "p5";
-import { Grid, hasLinkAtEast, hasLinkAtNorth, hasLinkAtSouth, rows } from "./grid";
+import {
+  Grid,
+  hasLinkAtEast,
+  hasLinkAtNorth,
+  hasLinkAtSouth,
+  rows,
+  distances,
+} from "./grid";
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
 import { replicate } from "./replicate";
@@ -32,6 +39,7 @@ export const toP5 = (p: p5) => (offset: Position, m: Grid): void => {
   const [h] = m.dimensions;
   const [offY, offX] = offset;
   const height = h - 1;
+  const ds = distances(m, [0, 0]);
 
   p.stroke(stroke);
   p.strokeWeight(strokeWeight);

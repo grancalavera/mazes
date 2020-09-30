@@ -1,5 +1,5 @@
 import { Direction, neighbors, Neighbors, toArray, walk } from "./neighbors";
-import { isSome } from "./option";
+import { isSome, isNone, Option, none, some } from "./option";
 import {
   Dimensions,
   Index,
@@ -8,7 +8,7 @@ import {
   positionToIndex,
   unsafePositionFromIndex,
 } from "./plane";
-import { replicate } from "./replicate";
+import { link } from "fs/promises";
 
 export interface Grid {
   readonly dimensions: Dimensions;
@@ -64,7 +64,7 @@ const makeCell = (d: Dimensions, index: Index): Cell => {
   };
 };
 
-export const areNeighbors = (a: Cell, b: Cell): boolean =>
+const areNeighbors = (a: Cell, b: Cell): boolean =>
   isNeighborOf(a, b) && isNeighborOf(b, a);
 
 const isNeighborOf = (cell: Cell, candidate: Cell): boolean =>
@@ -80,6 +80,24 @@ export const carveNorth = carve("north");
 export const carveSouth = carve("south");
 export const carveEast = carve("east");
 export const carveWest = carve("west");
+
+export const links = (g: Grid, p: Position): Cell[] => {
+  const cellAt = cellAtPosition(g);
+
+  const cellOption = cellAt(p);
+  if (isNone(cellOption)) return [];
+
+  return toArray(cellOption.value.neighbors)
+    .filter(([np]) => linksTo(g, p, np))
+    .map(([np]) => cellAt(np))
+    .filter(isSome)
+    .map((x) => x.value);
+};
+
+export const cellAtPosition = (g: Grid) => (p: Position): Option<Cell> => {
+  const indexOption = positionToIndex(g.dimensions)(p);
+  return isSome(indexOption) ? some(g.cells[indexOption.value]) : none;
+};
 
 export const linkCells = (g: Grid, a: Position, b: Position): Grid =>
   withIndexes(g, a, b, g, (ia, ib) => {
@@ -137,3 +155,34 @@ export const hasLinkAtNorth = hasLinkAt("north");
 export const hasLinkAtSouth = hasLinkAt("south");
 export const hasLinkAtEast = hasLinkAt("east");
 export const hasLinkAtWest = hasLinkAt("west");
+
+export const distances = (g: Grid, p: Position): Option<Record<number, number>> => {
+  const cellOption = cellAtPosition(g)(p);
+
+  if (isNone(cellOption)) return none;
+  const cell = cellOption.value;
+
+  const result: Record<number, number> = {
+    [cell.index]: 0,
+  };
+
+  let frontier: Cell[] = [cell];
+
+  while (frontier.length > 0) {
+    const newFrontier: Cell[] = [];
+
+    frontier
+      .flatMap((c) => links(g, c.pos).map((l) => [c, l] as const))
+      .forEach(([c, l]) => {
+        const visited = Number.isInteger(result[l.index]);
+        if (!visited) {
+          result[l.index] = result[c.index] + 1;
+          newFrontier.push(l);
+        }
+      });
+
+    frontier = newFrontier;
+  }
+
+  return some(result);
+};

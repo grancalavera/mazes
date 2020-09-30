@@ -1,15 +1,9 @@
-import { Grid } from "./grid";
-import { toArray } from "./neighbors";
+import { distances } from "./grid";
 import * as render from "./render";
-import { maze1, maze3 } from "./sidewinder-fixtures";
-import "./render-four-of-each";
+import { maze1 } from "./sidewinder-fixtures";
+
 // https://jelv.is/blog/Generating-Mazes-with-Inductive-Graphs/
 
 render.toConsole(maze1);
-
-const f = (g: Grid, i: number, d: number): [number, number][] => {
-  const cell = g.cells[i];
-  return toArray(cell.neighbors).map(([pos, i]) => [i, d + 1]);
-};
-
-console.log(f(maze3, 0, 0));
+console.log(JSON.stringify(distances(maze1, [0, 0]), null, 2));
+// console.log(links(maze3, [0, 0]));
