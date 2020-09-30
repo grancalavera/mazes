@@ -137,24 +137,3 @@ export const hasLinkAtNorth = hasLinkAt("north");
 export const hasLinkAtSouth = hasLinkAt("south");
 export const hasLinkAtEast = hasLinkAt("east");
 export const hasLinkAtWest = hasLinkAt("west");
-
-export const print = (g: Grid): void => {
-  let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
-
-  rows(g)
-    .reverse()
-    .forEach((row) => {
-      let top = "|";
-      let bottom = "+";
-      row.forEach((cell) => {
-        const body = "   ";
-        const eastBoundary = hasLinkAtEast(g, cell) ? " " : "|";
-        top += body + eastBoundary;
-        const southBoundary = hasLinkAtSouth(g, cell) ? "   " : "---";
-        bottom += southBoundary + "+";
-      });
-      output += top + "\n" + bottom + "\n";
-    });
-
-  console.log(output);
-};
