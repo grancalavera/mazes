@@ -156,6 +156,9 @@ export const hasLinkAtSouth = hasLinkAt("south");
 export const hasLinkAtEast = hasLinkAt("east");
 export const hasLinkAtWest = hasLinkAt("west");
 
+// one day...
+// https://jelv.is/blog/Generating-Mazes-with-Inductive-Graphs/
+
 export const distances = (g: Grid, p: Position): Option<Record<number, number>> => {
   const cellOption = cellAtPosition(g)(p);
 

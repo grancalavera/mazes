@@ -10,9 +10,16 @@ import {
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
 import { replicate } from "./replicate";
+import { isNone } from "./option";
 
 export const toConsole = (g: Grid): void => {
   let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
+  const ds = distances(g, [0, 0]);
+
+  const dForI = (i: number): string => {
+    const d = isNone(ds) ? "" : ds.value[i];
+    return d.toString().padEnd(3, " ");
+  };
 
   rows(g)
     .reverse()
@@ -20,7 +27,7 @@ export const toConsole = (g: Grid): void => {
       let top = "|";
       let bottom = "+";
       row.forEach((cell) => {
-        const body = "   ";
+        const body = dForI(cell.index);
         const eastBoundary = hasLinkAtEast(g, cell) ? " " : "|";
         top += body + eastBoundary;
         const southBoundary = hasLinkAtSouth(g, cell) ? "   " : "---";
@@ -39,7 +46,6 @@ export const toP5 = (p: p5) => (offset: Position, m: Grid): void => {
   const [h] = m.dimensions;
   const [offY, offX] = offset;
   const height = h - 1;
-  const ds = distances(m, [0, 0]);
 
   p.stroke(stroke);
   p.strokeWeight(strokeWeight);
