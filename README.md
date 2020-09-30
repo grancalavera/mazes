@@ -4,5 +4,4 @@
 
 # requirements
 
-* node 12+
-* yarn berry
+- node 12+
