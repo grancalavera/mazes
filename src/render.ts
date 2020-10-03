@@ -15,10 +15,8 @@ export const toConsole = (g: Grid): void => {
   let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
   const ds = distances(g, [0, 0]);
 
-  const dForI = (i: number): string => {
-    const d: number | undefined = ds[i];
-    return (d?.toString() ?? "").padEnd(3, " ");
-  };
+  const distanceForIndex = (i: number): string =>
+    (ds[i]?.toString() ?? "").padStart(3, " ");
 
   rows(g)
     .reverse()
@@ -26,7 +24,7 @@ export const toConsole = (g: Grid): void => {
       let top = "|";
       let bottom = "+";
       row.forEach((cell) => {
-        const body = dForI(cell.index);
+        const body = distanceForIndex(cell.index);
         const eastBoundary = hasLinkAtEast(g, cell) ? " " : "|";
         top += body + eastBoundary;
         const southBoundary = hasLinkAtSouth(g, cell) ? "   " : "---";
