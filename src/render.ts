@@ -1,16 +1,15 @@
 import p5 from "p5";
 import {
+  distances,
   Grid,
   hasLinkAtEast,
   hasLinkAtNorth,
   hasLinkAtSouth,
   rows,
-  distances,
 } from "./grid";
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
 import { replicate } from "./replicate";
-import { isNone } from "./option";
 
 export const toConsole = (g: Grid): void => {
   let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
@@ -18,7 +17,7 @@ export const toConsole = (g: Grid): void => {
 
   const dForI = (i: number): string => {
     const d: number | undefined = ds[i];
-    return d.toString().padEnd(3, " ");
+    return (d?.toString() ?? "").padEnd(3, " ");
   };
 
   rows(g)

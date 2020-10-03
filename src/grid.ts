@@ -160,32 +160,32 @@ export const hasLinkAtWest = hasLinkAt("west");
 
 type Distances = Record<Index, number | undefined>;
 
-export const distances = (g: Grid, p: Position): Distances => {
-  const indexOption = positionToIndex(g.dimensions)(p);
+export const distances = (grid: Grid, p: Position): Distances => {
+  const indexOption = positionToIndex(grid.dimensions)(p);
   return isNone(indexOption)
     ? {}
-    : Object.fromEntries(distancesInternal(g, [indexOption.value] ?? [], 0, []));
+    : Object.fromEntries(distancesRecursive(grid, [indexOption.value] ?? [], 0, []));
 };
 
-const distancesInternal = (
-  g: Grid,
+const distancesRecursive = (
+  grid: Grid,
   frontier: Index[],
   distance: number,
   seen: Index[]
 ): (readonly [Index, number])[] => {
-  const notSeen = frontier.filter((i) => !seen.includes(i));
-  if (notSeen.length === 0) {
+  if (frontier.length === 0) {
     return [];
   }
 
-  const distances = notSeen.map((i) => [i, distance] as const);
+  const atFrontier = frontier.map((i) => [i, distance] as const);
+  const beyondFrontier = frontier.flatMap((i) =>
+    distancesRecursive(
+      grid,
+      (grid.links[i] ?? []).filter((j) => !seen.includes(j)),
+      distance + 1,
+      [...seen, ...frontier]
+    )
+  );
 
-  const furtherDistances = notSeen.flatMap((i) => {
-    const f = g.links[i] ?? [];
-    const d = distance + 1;
-    const s = [...seen, ...frontier];
-    return distancesInternal(g, f, d, s);
-  });
-
-  return [...distances, ...furtherDistances];
+  return [...atFrontier, ...beyondFrontier];
 };
