@@ -1,5 +1,5 @@
 import { Direction, neighbors, Neighbors, toArray, walk } from "./neighbors";
-import { isSome, isNone, Option, none, some } from "./option";
+import { isNone, isSome, none, Option, some } from "./option";
 import {
   Dimensions,
   Index,
@@ -8,7 +8,6 @@ import {
   positionToIndex,
   unsafePositionFromIndex,
 } from "./plane";
-import { link } from "fs/promises";
 
 export interface Grid {
   readonly dimensions: Dimensions;
@@ -159,33 +158,34 @@ export const hasLinkAtWest = hasLinkAt("west");
 // one day...
 // https://jelv.is/blog/Generating-Mazes-with-Inductive-Graphs/
 
-export const distances = (g: Grid, p: Position): Option<Record<number, number>> => {
-  const cellOption = cellAtPosition(g)(p);
+type Distances = Record<Index, number | undefined>;
 
-  if (isNone(cellOption)) return none;
-  const cell = cellOption.value;
+export const distances = (g: Grid, p: Position): Distances => {
+  const indexOption = positionToIndex(g.dimensions)(p);
+  return isNone(indexOption)
+    ? {}
+    : Object.fromEntries(distancesInternal(g, [indexOption.value] ?? [], 0, []));
+};
 
-  const result: Record<number, number> = {
-    [cell.index]: 0,
-  };
-
-  let frontier: Cell[] = [cell];
-
-  while (frontier.length > 0) {
-    const newFrontier: Cell[] = [];
-
-    frontier
-      .flatMap((c) => links(g, c.pos).map((l) => [c, l] as const))
-      .forEach(([c, l]) => {
-        const visited = Number.isInteger(result[l.index]);
-        if (!visited) {
-          result[l.index] = result[c.index] + 1;
-          newFrontier.push(l);
-        }
-      });
-
-    frontier = newFrontier;
+const distancesInternal = (
+  g: Grid,
+  frontier: Index[],
+  distance: number,
+  seen: Index[]
+): (readonly [Index, number])[] => {
+  const notSeen = frontier.filter((i) => !seen.includes(i));
+  if (notSeen.length === 0) {
+    return [];
   }
 
-  return some(result);
+  const distances = notSeen.map((i) => [i, distance] as const);
+
+  const furtherDistances = notSeen.flatMap((i) => {
+    const f = g.links[i] ?? [];
+    const d = distance + 1;
+    const s = [...seen, ...frontier];
+    return distancesInternal(g, f, d, s);
+  });
+
+  return [...distances, ...furtherDistances];
 };

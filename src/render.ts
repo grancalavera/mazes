@@ -17,7 +17,7 @@ export const toConsole = (g: Grid): void => {
   const ds = distances(g, [0, 0]);
 
   const dForI = (i: number): string => {
-    const d = isNone(ds) ? "" : ds.value[i];
+    const d: number | undefined = ds[i];
     return d.toString().padEnd(3, " ");
   };
 

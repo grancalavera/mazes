@@ -1,7 +1,6 @@
 import { distances } from "./grid";
+import { maze3 } from "./sidewinder-fixtures";
 import * as render from "./render";
-import { maze1 } from "./sidewinder-fixtures";
-import "./render-four-of-each";
 
-render.toConsole(maze1);
-console.log(JSON.stringify(distances(maze1, [0, 0]), null, 2));
+render.toConsole(maze3);
+console.log(JSON.stringify(distances(maze3, [0, 0]), null, 2));
