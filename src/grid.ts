@@ -162,9 +162,9 @@ type Distances = Record<Index, number | undefined>;
 
 export const distances = (grid: Grid, p: Position): Distances => {
   const indexOption = positionToIndex(grid.dimensions)(p);
-  return isNone(indexOption)
-    ? {}
-    : Object.fromEntries(distancesRecursive(grid, [indexOption.value] ?? [], 0, []));
+  return isSome(indexOption)
+    ? Object.fromEntries(distancesRecursive(grid, [indexOption.value] ?? [], 0, []))
+    : {};
 };
 
 const distancesRecursive = (
