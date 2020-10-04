@@ -176,14 +176,11 @@ const distancesRecursive = (
   if (frontier.length === 0) {
     return [];
   }
-
   const atFrontier = frontier.map((i) => [i, distance] as const);
-
   const notSeen = (i: number) => (grid.links[i] ?? []).filter((j) => !seen.includes(j));
   const nextSeen = [...seen, ...frontier];
   const beyondFrontier = frontier.flatMap((i) =>
     distancesRecursive(grid, notSeen(i), distance + 1, nextSeen)
   );
-
   return [...atFrontier, ...beyondFrontier];
 };

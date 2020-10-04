@@ -7,12 +7,6 @@ render.toConsole(m);
 
 new p5((p: p5) => {
   const d = render.toP5(p);
-
-  p.setup = () => {
-    p.createCanvas(p.windowWidth, p.windowHeight);
-  };
-
-  p.draw = () => {
-    d([20, 20], m);
-  };
+  p.setup = () => p.createCanvas(p.windowWidth, p.windowHeight);
+  p.draw = () => d([20, 20], m);
 });

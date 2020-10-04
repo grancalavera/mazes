@@ -12,7 +12,7 @@ import { Position } from "./plane";
 import { replicate } from "./replicate";
 
 export const toConsole = (g: Grid): void => {
-  let output = `+${replicate(g.dimensions[1])("---+").join("")}\n`;
+  let output = `\n+${replicate(g.dimensions[1])("---+").join("")}\n`;
   const ds = distances(g, [0, 0]);
 
   const distanceForIndex = (i: number): string =>
