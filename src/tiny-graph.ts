@@ -7,6 +7,17 @@ type TinyNode = number;
 type Merge = (g1: TinyGraph, g2: TinyGraph) => TinyGraph;
 type AddLink = (g: TinyGraph, n1: TinyNode, n2: TinyNode) => Option<TinyGraph>;
 type Distances = (g: TinyGraph, n: TinyNode) => TinyDistances;
+type ShortestPath = (g: TinyGraph, goal: TinyNode) => readonly TinyNode[];
+
+export const isValid = (g: TinyGraph): boolean => {
+  const ks = keys(g);
+  if (ks.length < 1) return false;
+
+  const hasSelfLinks = ks.some((k) => (g[k] ?? []).some((n) => n === k));
+  if (hasSelfLinks) return false;
+
+  return true;
+};
 
 export const merge: Merge = (g1, g2) =>
   Object.fromEntries(
@@ -20,11 +31,22 @@ export const merge: Merge = (g1, g2) =>
 export const addLink: AddLink = (g, n1, n2) => {
   const h = hasNode(g);
   const l = link(g);
-  return h(n1) && h(n2) ? some({ ...g, [n1]: l(n1, n2), [n2]: l(n2, n1) }) : none;
+  const isSelfLink = n1 === n2;
+  return h(n1) && h(n2) && !isSelfLink
+    ? some({ ...g, [n1]: l(n1, n2), [n2]: l(n2, n1) })
+    : none;
 };
 
 export const distances: Distances = (g, n) =>
   hasNode(g)(n) ? Object.fromEntries(distancesRecursive(g, [n], 0, [])) : {};
+
+export const shortestPath: ShortestPath = (g, goal) => {
+  if (!isValid(g)) return [];
+  if (!hasNode(g)(goal)) return [];
+
+  const d = distances(g, 0);
+  return shortestPathRecursive(g, d, 0, goal);
+};
 
 const link = (g: TinyGraph) => (n1: TinyNode, n2: TinyNode): readonly TinyNode[] => [
   ...new Set([...(g[n1] ?? []), n2]),
@@ -49,4 +71,14 @@ const distancesRecursive = (
       distancesRecursive(g, notSeen(n), distance + 1, [...seen, ...frontier])
     ),
   ];
+};
+
+const shortestPathRecursive = (
+  g: TinyGraph,
+  d: TinyDistances,
+  current: TinyNode,
+  goal: TinyNode
+): readonly TinyNode[] => {
+  if (current === goal) return [];
+  return [];
 };
