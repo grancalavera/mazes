@@ -2,7 +2,7 @@ import * as g from "./grid";
 
 export const maze1: g.Grid = {
   ...g.makeGrid([4, 4]),
-  links: {
+  graph: {
     0: [1, 4],
     1: [0],
     2: [3],
@@ -24,7 +24,7 @@ export const maze1: g.Grid = {
 
 export const maze2: g.Grid = {
   ...g.makeGrid([4, 4]),
-  links: {
+  graph: {
     0: [1],
     1: [0, 5],
     2: [3],
@@ -46,7 +46,7 @@ export const maze2: g.Grid = {
 
 export const maze3: g.Grid = {
   ...g.makeGrid([5, 5]),
-  links: {
+  graph: {
     0: [1, 5],
     1: [0],
     2: [3, 7],

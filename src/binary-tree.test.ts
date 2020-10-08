@@ -10,7 +10,7 @@ const horizontalBinaryTree = bt.binaryTree(r.trueCoin);
 
 const verticalGrid: g.Grid = {
   ...g.makeGrid([2, 2]),
-  links: {
+  graph: {
     0: [2],
     1: [3],
     2: [0, 3],
@@ -20,7 +20,7 @@ const verticalGrid: g.Grid = {
 
 const horizontalGrid: g.Grid = {
   ...g.makeGrid([2, 2]),
-  links: {
+  graph: {
     0: [1],
     1: [0, 3],
     2: [3],

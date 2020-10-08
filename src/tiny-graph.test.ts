@@ -1,5 +1,5 @@
 import { none, some } from "./option";
-import { addLink, distances, merge, shortestPath, isValid } from "./tiny-graph";
+import { addLink, distances, isValid, merge, shortestPath } from "./tiny-graph";
 
 describe("tiny graph", () => {
   it("valid 1: self links aren't valid", () => {
@@ -151,7 +151,7 @@ describe("tiny graph", () => {
   it("shortest path 2", () => {
     const g = { 0: [] };
     const actual = shortestPath(g, 0);
-    expect(actual).toEqual([]);
+    expect(actual).toEqual([0]);
   });
 
   it("shortest path 3", () => {
@@ -162,9 +162,32 @@ describe("tiny graph", () => {
     expect(actual).toEqual([]);
   });
 
-  xit("shortest path 4", () => {
+  it("shortest path 4", () => {
     const g = { 0: [1], 1: [0] };
     const actual = shortestPath(g, 1);
     expect(actual).toEqual([0, 1]);
+  });
+
+  it("shortest path 5", () => {
+    const g = {
+      0: [1],
+      1: [0, 3],
+      2: [3],
+      3: [1],
+    };
+    const actual = shortestPath(g, 2);
+    expect(actual).toEqual([0, 1, 3, 2]);
+  });
+
+  it("shortest path 6", () => {
+    // this solution should be non-deterministic: there are two possible shortest paths
+    const g = {
+      0: [1, 2],
+      1: [0, 3],
+      2: [0, 3],
+      3: [1, 2],
+    };
+    const actual = shortestPath(g, 3);
+    expect(actual).toEqual([0, 2, 3]);
   });
 });

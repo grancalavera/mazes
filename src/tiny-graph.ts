@@ -1,13 +1,13 @@
 import { none, Option, some } from "./option";
 
-type TinyGraph = Record<number, readonly TinyNode[] | undefined>;
-type TinyDistances = Record<number, number | undefined>;
+export type TinyGraph = Record<number, readonly TinyNode[] | undefined>;
+export type TinyDistances = Record<number, number | undefined>;
 type TinyNode = number;
 
 type Merge = (g1: TinyGraph, g2: TinyGraph) => TinyGraph;
 type AddLink = (g: TinyGraph, n1: TinyNode, n2: TinyNode) => Option<TinyGraph>;
-type Distances = (g: TinyGraph, n: TinyNode) => TinyDistances;
 type ShortestPath = (g: TinyGraph, goal: TinyNode) => readonly TinyNode[];
+type Distances = (g: TinyGraph, n: TinyNode) => TinyDistances;
 
 export const isValid = (g: TinyGraph): boolean => {
   const ks = keys(g);
@@ -37,15 +37,39 @@ export const addLink: AddLink = (g, n1, n2) => {
     : none;
 };
 
-export const distances: Distances = (g, n) =>
-  hasNode(g)(n) ? Object.fromEntries(distancesRecursive(g, [n], 0, [])) : {};
+export const distances: Distances = (g, n) => {
+  const rec = (
+    frontier: TinyNode[],
+    distance: number,
+    seen: TinyNode[]
+  ): (readonly [TinyNode, number])[] => {
+    const notSeen = (n: TinyNode) => (g[n] ?? []).filter((m) => !seen.includes(m));
+    return [
+      ...frontier.map((n) => [n, distance] as const),
+      ...frontier.flatMap((n) => rec(notSeen(n), distance + 1, [...seen, ...frontier])),
+    ];
+  };
+
+  return hasNode(g)(n) ? Object.fromEntries(rec([n], 0, [])) : {};
+};
 
 export const shortestPath: ShortestPath = (g, goal) => {
   if (!isValid(g)) return [];
   if (!hasNode(g)(goal)) return [];
+  const far = Number.POSITIVE_INFINITY;
+  const ds = distances(g, 0);
+  const d = (n: TinyNode): number => ds[n] ?? far;
 
-  const d = distances(g, 0);
-  return shortestPathRecursive(g, d, 0, goal);
+  const rec = (current: TinyNode, path: TinyNode[]): readonly TinyNode[] => {
+    if (current === 0) return path;
+    const neighbors = g[current] ?? [];
+    if (neighbors.length === 0) return path;
+    const c = neighbors.reduce((n1, n2) => (d(n1) < d(n2) ? n1 : n2), far);
+    const p = [c, ...path];
+    return rec(c, p);
+  };
+
+  return rec(goal, [goal]);
 };
 
 const link = (g: TinyGraph) => (n1: TinyNode, n2: TinyNode): readonly TinyNode[] => [
@@ -57,28 +81,3 @@ const keys = (g: TinyGraph) => Object.keys(g).map((k) => parseInt(k));
 const mergeKeys = (g1: TinyGraph, g2: TinyGraph): number[] => [
   ...new Set([...keys(g1), ...keys(g2)]),
 ];
-
-const distancesRecursive = (
-  g: TinyGraph,
-  frontier: TinyNode[],
-  distance: number,
-  seen: TinyNode[]
-): (readonly [TinyNode, number])[] => {
-  const notSeen = (n: TinyNode) => (g[n] ?? []).filter((m) => !seen.includes(m));
-  return [
-    ...frontier.map((n) => [n, distance] as const),
-    ...frontier.flatMap((n) =>
-      distancesRecursive(g, notSeen(n), distance + 1, [...seen, ...frontier])
-    ),
-  ];
-};
-
-const shortestPathRecursive = (
-  g: TinyGraph,
-  d: TinyDistances,
-  current: TinyNode,
-  goal: TinyNode
-): readonly TinyNode[] => {
-  if (current === goal) return [];
-  return [];
-};

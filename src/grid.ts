@@ -1,5 +1,5 @@
 import { Direction, neighbors, Neighbors, toArray, walk } from "./neighbors";
-import { isNone, isSome, none, Option, some } from "./option";
+import { isSome, none, Option, some } from "./option";
 import {
   Dimensions,
   Index,
@@ -8,11 +8,18 @@ import {
   positionToIndex,
   unsafePositionFromIndex,
 } from "./plane";
+import {
+  addLink as tgAddLink,
+  distances as tgDistances,
+  shortestPath as tgShortestPath,
+  TinyDistances,
+  TinyGraph,
+} from "./tiny-graph";
 
 export interface Grid {
   readonly dimensions: Dimensions;
   readonly cells: Cell[];
-  readonly links: Links;
+  readonly graph: TinyGraph;
 }
 
 export interface Cell {
@@ -41,20 +48,18 @@ export const rows = (g: Grid) => {
   return rs;
 };
 
-type Links = Record<Index, Index[] | undefined>;
-type ChangeLink = (from: Index, to: Index) => (links: Links) => Links;
-
 export type Row = Cell[];
 
 export const makeGrid = (d: Dimensions): Grid => {
+  const nodes = [...Array(d[0] * d[1])].map((_, i) => i);
   return {
     dimensions: d,
-    cells: [...Array(d[0] * d[1])].map((_, i) => makeCell(d, i)),
-    links: {},
+    cells: nodes.map(makeCell(d)),
+    graph: Object.fromEntries(nodes.map((n) => [n, []])),
   };
 };
 
-const makeCell = (d: Dimensions, index: Index): Cell => {
+const makeCell = (d: Dimensions) => (index: Index): Cell => {
   const pos = unsafePositionFromIndex(d)(index);
   return {
     index,
@@ -80,19 +85,6 @@ export const carveSouth = carve("south");
 export const carveEast = carve("east");
 export const carveWest = carve("west");
 
-export const links = (g: Grid, p: Position): Cell[] => {
-  const cellAt = cellAtPosition(g);
-
-  const cellOption = cellAt(p);
-  if (isNone(cellOption)) return [];
-
-  return toArray(cellOption.value.neighbors)
-    .filter(([np]) => linksTo(g, p, np))
-    .map(([np]) => cellAt(np))
-    .filter(isSome)
-    .map((x) => x.value);
-};
-
 export const cellAtPosition = (g: Grid) => (p: Position): Option<Cell> => {
   const indexOption = positionToIndex(g.dimensions)(p);
   return isSome(indexOption) ? some(g.cells[indexOption.value]) : none;
@@ -104,29 +96,14 @@ export const linkCells = (g: Grid, a: Position, b: Position): Grid =>
       return g;
     }
 
-    const fwd = addLink(ia, ib);
-    const bwd = addLink(ib, ia);
-    return { ...g, links: bwd(fwd(g.links)) };
+    const result = tgAddLink(g.graph, ia, ib);
+
+    if (isSome(result)) {
+      return { ...g, graph: result.value };
+    } else {
+      return g;
+    }
   });
-
-export const unlinkCells = (g: Grid, a: Position, b: Position): Grid =>
-  withIndexes(g, a, b, g, (ia, ib) => {
-    const fwd = removeLink(ia, ib);
-    const bwd = removeLink(ib, ia);
-    return { ...g, links: bwd(fwd(g.links)) };
-  });
-
-const addLink: ChangeLink = (from, to) => (links) => {
-  const linkSet = new Set([...(links[from] ?? []), to]);
-  return { ...links, [from]: Array.from(linkSet) };
-};
-
-const removeLink: ChangeLink = (from, to) => (links) => {
-  return {
-    ...links,
-    [from]: (links[from] ?? []).filter((candidate) => candidate !== to),
-  };
-};
 
 const withIndexes = <T>(
   g: Grid,
@@ -142,7 +119,7 @@ const withIndexes = <T>(
 };
 
 export const linksTo = (g: Grid, a: Position, b: Position): boolean =>
-  withIndexes(g, a, b, false, (ia, ib) => (g.links[ia] ?? []).includes(ib));
+  withIndexes(g, a, b, false, (ia, ib) => (g.graph[ia] ?? []).includes(ib));
 
 const hasLinkAt = (dir: Direction) => (g: Grid, c: Cell): boolean => {
   const here = c.pos;
@@ -155,32 +132,12 @@ export const hasLinkAtSouth = hasLinkAt("south");
 export const hasLinkAtEast = hasLinkAt("east");
 export const hasLinkAtWest = hasLinkAt("west");
 
-// one day...
-// https://jelv.is/blog/Generating-Mazes-with-Inductive-Graphs/
-
-type Distances = Record<Index, number | undefined>;
-
-export const distances = (grid: Grid, p: Position): Distances => {
+export const distances = (grid: Grid, p: Position): TinyDistances => {
   const indexOption = positionToIndex(grid.dimensions)(p);
-  return isSome(indexOption)
-    ? Object.fromEntries(distancesRecursive(grid, [indexOption.value] ?? [], 0, []))
-    : {};
+  return isSome(indexOption) ? tgDistances(grid.graph, indexOption.value) : {};
 };
 
-const distancesRecursive = (
-  grid: Grid,
-  frontier: Index[],
-  distance: number,
-  seen: Index[]
-): (readonly [Index, number])[] => {
-  if (frontier.length === 0) {
-    return [];
-  }
-  const atFrontier = frontier.map((i) => [i, distance] as const);
-  const notSeen = (i: number) => (grid.links[i] ?? []).filter((j) => !seen.includes(j));
-  const nextSeen = [...seen, ...frontier];
-  const beyondFrontier = frontier.flatMap((i) =>
-    distancesRecursive(grid, notSeen(i), distance + 1, nextSeen)
-  );
-  return [...atFrontier, ...beyondFrontier];
+export const shortestPath = (grid: Grid, p: Position): readonly Index[] => {
+  const indexOption = positionToIndex(grid.dimensions)(p);
+  return isSome(indexOption) ? tgShortestPath(grid.graph, indexOption.value) : [];
 };
