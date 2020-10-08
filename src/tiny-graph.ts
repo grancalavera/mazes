@@ -6,8 +6,6 @@ type TinyNode = number;
 
 type Merge = (g1: TinyGraph, g2: TinyGraph) => TinyGraph;
 type AddLink = (g: TinyGraph, n1: TinyNode, n2: TinyNode) => Option<TinyGraph>;
-type ShortestPath = (g: TinyGraph, goal: TinyNode) => readonly TinyNode[];
-type Distances = (g: TinyGraph, n: TinyNode) => TinyDistances;
 
 export const isValid = (g: TinyGraph): boolean => {
   const ks = keys(g);
@@ -37,7 +35,7 @@ export const addLink: AddLink = (g, n1, n2) => {
     : none;
 };
 
-export const distances: Distances = (g, n) => {
+export const distances = (g: TinyGraph, n: TinyNode): TinyDistances => {
   const rec = (
     frontier: TinyNode[],
     distance: number,
@@ -53,7 +51,7 @@ export const distances: Distances = (g, n) => {
   return hasNode(g)(n) ? Object.fromEntries(rec([n], 0, [])) : {};
 };
 
-export const shortestPath: ShortestPath = (g, goal) => {
+export const shortestPath = (g: TinyGraph, goal: TinyNode): readonly TinyNode[] => {
   if (!isValid(g)) return [];
   if (!hasNode(g)(goal)) return [];
   const far = Number.POSITIVE_INFINITY;
