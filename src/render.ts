@@ -6,7 +6,7 @@ import {
   hasLinkAtNorth,
   hasLinkAtSouth,
   rows,
-  shortestPath,
+  shortestPath
 } from "./grid";
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
@@ -38,20 +38,22 @@ export const toConsole = (g: Grid, goal: Position): void => {
 
 export const toP5 = (g: Grid, goal: Position) => {
   new p5((p: p5) => {
+
+    const offset: Position = [20, 20]
+    const cellSize = 20;
+    const strokeWeight = 10;
+    const stroke = 0;
+    const [h] = g.dimensions;
+    const [offY, offX] = offset;
+    const height = h - 1;
+    const sp = shortestPath(g, goal);
+    const [cr, cg, cb] = chroma("gold").rgb();
+
     p.setup = () => {
       p.createCanvas(p.windowWidth, p.windowHeight)
     }
 
     p.draw = () => {
-      const offset: Position = [20, 20]
-      const cellSize = 20;
-      const strokeWeight = 10;
-      const stroke = 0;
-      const [h] = g.dimensions;
-      const [offY, offX] = offset;
-      const height = h - 1;
-      const sp = shortestPath(g, goal);
-      const [cr, cg, cb] = chroma("gold").rgb();
 
       p.strokeWeight(0);
       p.fill(cr, cg, cb);
