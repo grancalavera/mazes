@@ -1,14 +1,9 @@
-import p5 from "p5";
-import { Dimensions, Position } from "./plane";
+import { Position } from "./plane";
 import * as render from "./render";
 import { randomSidewinder } from "./sidewinder";
 
-const dimensions: Dimensions = [40, 40];
-const goal: Position = [39, 39];
-const maze = randomSidewinder(dimensions);
+const goal: Position = [19, 19];
+const maze = randomSidewinder([20, 20]);
 
-new p5((p: p5) => {
-  const d = render.toP5(p);
-  p.setup = () => p.createCanvas(p.windowWidth, p.windowHeight);
-  p.draw = () => d([20, 20], maze, goal);
-});
+render.toP5(maze, goal)
+render.toConsole(maze, goal)

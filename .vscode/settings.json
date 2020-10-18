@@ -1,0 +1,3 @@
+{
+  "gitlens.views.statusFileFormat": "${working  }${file}>"
+}
