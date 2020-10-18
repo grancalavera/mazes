@@ -2,10 +2,8 @@ import { none, Option, some } from "./option";
 
 export type TinyGraph = Record<number, readonly TinyNode[] | undefined>;
 export type TinyDistances = Record<number, number | undefined>;
-type TinyNode = number;
 
-type Merge = (g1: TinyGraph, g2: TinyGraph) => TinyGraph;
-type AddLink = (g: TinyGraph, n1: TinyNode, n2: TinyNode) => Option<TinyGraph>;
+type TinyNode = number;
 
 export const isValid = (g: TinyGraph): boolean => {
   const ks = keys(g);
@@ -17,6 +15,7 @@ export const isValid = (g: TinyGraph): boolean => {
   return true;
 };
 
+type Merge = (g1: TinyGraph, g2: TinyGraph) => TinyGraph;
 export const merge: Merge = (g1, g2) =>
   Object.fromEntries(
     mergeKeys(g1, g2).map((k) => {
@@ -26,6 +25,7 @@ export const merge: Merge = (g1, g2) =>
     })
   );
 
+type AddLink = (g: TinyGraph, n1: TinyNode, n2: TinyNode) => Option<TinyGraph>;
 export const addLink: AddLink = (g, n1, n2) => {
   const h = hasNode(g);
   const l = link(g);
@@ -35,7 +35,7 @@ export const addLink: AddLink = (g, n1, n2) => {
     : none;
 };
 
-export const distances = (g: TinyGraph, n: TinyNode): TinyDistances => {
+export const distances = (g: TinyGraph, goal: TinyNode): TinyDistances => {
   const rec = (
     frontier: TinyNode[],
     distance: number,
@@ -48,7 +48,7 @@ export const distances = (g: TinyGraph, n: TinyNode): TinyDistances => {
     ];
   };
 
-  return hasNode(g)(n) ? Object.fromEntries(rec([n], 0, [])) : {};
+  return hasNode(g)(goal) ? Object.fromEntries(rec([goal], 0, [])) : {};
 };
 
 export const shortestPath = (g: TinyGraph, goal: TinyNode): readonly TinyNode[] => {
@@ -76,6 +76,7 @@ const link = (g: TinyGraph) => (n1: TinyNode, n2: TinyNode): readonly TinyNode[]
 
 const hasNode = (g: TinyGraph) => (n: TinyNode): boolean => !!g[n];
 const keys = (g: TinyGraph) => Object.keys(g).map((k) => parseInt(k));
+
 const mergeKeys = (g1: TinyGraph, g2: TinyGraph): number[] => [
   ...new Set([...keys(g1), ...keys(g2)]),
 ];
