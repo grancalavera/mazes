@@ -6,11 +6,14 @@ import {
   hasLinkAtNorth,
   hasLinkAtSouth,
   rows,
-  shortestPath
+  shortestPath,
+  distances,
+  longestShortestPath,
 } from "./grid";
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
 import { replicate } from "./replicate";
+import { isSome } from "./option";
 
 export const toConsole = (g: Grid, goal: Position): void => {
   let output = `\n+${replicate(g.dimensions[1])("---+").join("")}\n`;
@@ -36,25 +39,23 @@ export const toConsole = (g: Grid, goal: Position): void => {
   console.log(output);
 };
 
-export const toP5 = (g: Grid, goal: Position) => {
+export const toP5 = (g: Grid) => {
   new p5((p: p5) => {
-
-    const offset: Position = [20, 20]
+    const offset: Position = [20, 20];
     const cellSize = 20;
     const strokeWeight = 10;
     const stroke = 0;
     const [h] = g.dimensions;
     const [offY, offX] = offset;
     const height = h - 1;
-    const sp = shortestPath(g, goal);
+    const sp = longestShortestPath(g);
     const [cr, cg, cb] = chroma("gold").rgb();
 
     p.setup = () => {
-      p.createCanvas(p.windowWidth, p.windowHeight)
-    }
+      p.createCanvas(p.windowWidth, p.windowHeight);
+    };
 
     p.draw = () => {
-
       p.strokeWeight(0);
       p.fill(cr, cg, cb);
 
@@ -96,6 +97,6 @@ export const toP5 = (g: Grid, goal: Position) => {
           p.line(x1, y2, x2, y2);
         }
       }
-    }
-  })
-}
+    };
+  });
+};

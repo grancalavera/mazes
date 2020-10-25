@@ -63,6 +63,7 @@ export const shortestPath = (
 ): readonly TinyNode[] => {
   if (!isValid(g)) return [];
   if (!hasNode(g)(goal)) return [];
+
   const far = Number.POSITIVE_INFINITY;
   const ds = distances(g, 0);
   const d = (n: TinyNode): number => ds[n] ?? far;

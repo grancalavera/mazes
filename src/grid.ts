@@ -14,6 +14,7 @@ import {
   shortestPath as tgShortestPath,
   TinyDistances,
   TinyGraph,
+  nodeWithLongestPath,
 } from "./tiny-graph";
 
 export interface Grid {
@@ -139,5 +140,13 @@ export const distances = (grid: Grid, p: Position): TinyDistances => {
 
 export const shortestPath = (grid: Grid, p: Position): readonly Index[] => {
   const indexOption = positionToIndex(grid.dimensions)(p);
-  return isSome(indexOption) ? tgShortestPath(grid.graph, indexOption.value) : [];
+  return isSome(indexOption)
+    ? tgShortestPath(grid.graph, indexOption.value)
+    : [];
+};
+
+export const longestShortestPath = (grid: Grid): readonly Index[] => {
+  const d = distances(grid, [0, 0]);
+  const nOption = nodeWithLongestPath(d);
+  return isSome(nOption) ? tgShortestPath(grid.graph, nOption.value[0]) : [];
 };
