@@ -1,5 +1,13 @@
 import { none, some } from "./option";
-import { addLink, distances, isValid, merge, shortestPath } from "./tiny-graph";
+import {
+  addLink,
+  distances,
+  isValid,
+  merge,
+  shortestPath,
+  nodeWithLongestPath,
+  TinyDistances,
+} from "./tiny-graph";
 
 describe("tiny graph", () => {
   it("valid 1: self links aren't valid", () => {
@@ -123,7 +131,17 @@ describe("tiny graph", () => {
       8: [5, 7],
     };
     const actual = distances(g, 0);
-    expect(actual).toEqual({ 0: 0, 1: 1, 2: 2, 3: 5, 4: 4, 5: 3, 6: 6, 7: 5, 8: 4 });
+    expect(actual).toEqual({
+      0: 0,
+      1: 1,
+      2: 2,
+      3: 5,
+      4: 4,
+      5: 3,
+      6: 6,
+      7: 5,
+      8: 4,
+    });
   });
 
   it("distances 4", () => {
@@ -139,7 +157,17 @@ describe("tiny graph", () => {
       8: [5, 7],
     };
     const actual = distances(g, 3);
-    expect(actual).toEqual({ 0: 5, 1: 4, 2: 3, 3: 0, 4: 1, 5: 2, 6: 5, 7: 4, 8: 3 });
+    expect(actual).toEqual({
+      0: 5,
+      1: 4,
+      2: 3,
+      3: 0,
+      4: 1,
+      5: 2,
+      6: 5,
+      7: 4,
+      8: 3,
+    });
   });
 
   it("shortest path 1", () => {
@@ -189,5 +217,41 @@ describe("tiny graph", () => {
     };
     const actual = shortestPath(g, 3);
     expect(actual).toEqual([0, 2, 3]);
+  });
+
+  it("nodeWithLongestPath 1", () => {
+    const td: TinyDistances = {};
+    const actual = nodeWithLongestPath(td);
+    expect(actual).toEqual(none);
+  });
+
+  it("nodeWithLongestPath 2", () => {
+    const td: TinyDistances = {
+      0: 0,
+    };
+
+    const actual = nodeWithLongestPath(td);
+    expect(actual).toEqual(some([0, 0]));
+  });
+
+  it("nodeWithLongestPath 3", () => {
+    const td: TinyDistances = {
+      0: 0,
+      1: 3,
+    };
+
+    const actual = nodeWithLongestPath(td);
+    expect(actual).toEqual(some([1, 3]));
+  });
+
+  it("nodeWithLongestPath 4", () => {
+    const td: TinyDistances = {
+      0: 0,
+      1: 3,
+      2: 1,
+    };
+
+    const actual = nodeWithLongestPath(td);
+    expect(actual).toEqual(some([1, 3]));
   });
 });

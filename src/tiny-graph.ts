@@ -1,6 +1,9 @@
 import { none, Option, some } from "./option";
 
 export type TinyGraph = Record<number, readonly TinyNode[] | undefined>;
+
+// The distance of the shortest path from 0 to each node.
+// Distances are calculated only for nodes connected to 0.
 export type TinyDistances = Record<number, number | undefined>;
 
 type TinyNode = number;
@@ -41,17 +44,23 @@ export const distances = (g: TinyGraph, goal: TinyNode): TinyDistances => {
     distance: number,
     seen: TinyNode[]
   ): (readonly [TinyNode, number])[] => {
-    const notSeen = (n: TinyNode) => (g[n] ?? []).filter((m) => !seen.includes(m));
+    const notSeen = (n: TinyNode) =>
+      (g[n] ?? []).filter((m) => !seen.includes(m));
     return [
       ...frontier.map((n) => [n, distance] as const),
-      ...frontier.flatMap((n) => rec(notSeen(n), distance + 1, [...seen, ...frontier])),
+      ...frontier.flatMap((n) =>
+        rec(notSeen(n), distance + 1, [...seen, ...frontier])
+      ),
     ];
   };
 
   return hasNode(g)(goal) ? Object.fromEntries(rec([goal], 0, [])) : {};
 };
 
-export const shortestPath = (g: TinyGraph, goal: TinyNode): readonly TinyNode[] => {
+export const shortestPath = (
+  g: TinyGraph,
+  goal: TinyNode
+): readonly TinyNode[] => {
   if (!isValid(g)) return [];
   if (!hasNode(g)(goal)) return [];
   const far = Number.POSITIVE_INFINITY;
@@ -70,13 +79,34 @@ export const shortestPath = (g: TinyGraph, goal: TinyNode): readonly TinyNode[] 
   return rec(goal, [goal]);
 };
 
-const link = (g: TinyGraph) => (n1: TinyNode, n2: TinyNode): readonly TinyNode[] => [
-  ...new Set([...(g[n1] ?? []), n2]),
-];
+export const nodeWithLongestPath = (
+  td: TinyDistances
+): Option<[TinyNode, number]> => {
+  const keys = Object.keys(td).map(Number);
+  if (keys.length < 1) {
+    return none;
+  }
+
+  return some(
+    keys.reduce(
+      ([prevNode, prevDistance], currentNode) => {
+        const currentDistance = td[currentNode] ?? 0;
+        return currentDistance > prevDistance
+          ? [currentNode, currentDistance]
+          : [prevNode, prevDistance];
+      },
+      [0, 0]
+    )
+  );
+};
+
+const link = (g: TinyGraph) => (
+  n1: TinyNode,
+  n2: TinyNode
+): readonly TinyNode[] => [...new Set([...(g[n1] ?? []), n2])];
 
 const hasNode = (g: TinyGraph) => (n: TinyNode): boolean => !!g[n];
-const keys = (g: TinyGraph) => Object.keys(g).map((k) => parseInt(k));
-
+const keys = (o: object) => Object.keys(o).map((k) => parseInt(k));
 const mergeKeys = (g1: TinyGraph, g2: TinyGraph): number[] => [
   ...new Set([...keys(g1), ...keys(g2)]),
 ];
