@@ -5,15 +5,15 @@ import {
   hasLinkAtEast,
   hasLinkAtNorth,
   hasLinkAtSouth,
+  longestShortestPath,
   rows,
   shortestPath,
-  distances,
-  longestShortestPath,
+  Cell,
+  getIntensities,
 } from "./grid";
 import { hasSouthNeighbor, hasWestNeighbor } from "./neighbors";
 import { Position } from "./plane";
 import { replicate } from "./replicate";
-import { isSome } from "./option";
 
 export const toConsole = (g: Grid, goal: Position): void => {
   let output = `\n+${replicate(g.dimensions[1])("---+").join("")}\n`;
@@ -39,6 +39,19 @@ export const toConsole = (g: Grid, goal: Position): void => {
   console.log(output);
 };
 
+const backgroundColor = (
+  bestSolution: readonly number[],
+  intensities: Record<number, number | undefined>
+) => (c: Cell) => {
+  if (bestSolution.includes(c.index)) {
+    return chroma("gold").rgb();
+  } else {
+    return chroma("green")
+      .luminance(intensities[c.index] ?? 0)
+      .rgb();
+  }
+};
+
 export const toP5 = (g: Grid) => {
   new p5((p: p5) => {
     const offset: Position = [20, 20];
@@ -48,8 +61,8 @@ export const toP5 = (g: Grid) => {
     const [h] = g.dimensions;
     const [offY, offX] = offset;
     const height = h - 1;
-    const sp = longestShortestPath(g);
-    const [cr, cg, cb] = chroma("gold").rgb();
+
+    const bgColor = backgroundColor(longestShortestPath(g), getIntensities(g));
 
     p.setup = () => {
       p.createCanvas(p.windowWidth, p.windowHeight);
@@ -57,14 +70,14 @@ export const toP5 = (g: Grid) => {
 
     p.draw = () => {
       p.strokeWeight(0);
-      p.fill(cr, cg, cb);
 
       for (const cell of g.cells) {
-        if (!sp.includes(cell.index)) continue;
         const [r, col] = cell.pos;
         const row = height - r;
         const x1 = col * cellSize + offX;
         const y1 = row * cellSize + offY;
+
+        p.fill(bgColor(cell));
         p.rect(x1, y1, cellSize, cellSize);
       }
 

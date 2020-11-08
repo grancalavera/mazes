@@ -140,13 +140,28 @@ export const distances = (grid: Grid, p: Position): TinyDistances => {
 
 export const shortestPath = (grid: Grid, p: Position): readonly Index[] => {
   const indexOption = positionToIndex(grid.dimensions)(p);
-  return isSome(indexOption)
-    ? tgShortestPath(grid.graph, indexOption.value)
-    : [];
+  return isSome(indexOption) ? tgShortestPath(grid.graph, indexOption.value) : [];
 };
 
 export const longestShortestPath = (grid: Grid): readonly Index[] => {
   const d = distances(grid, [0, 0]);
   const nOption = nodeWithLongestPath(d);
   return isSome(nOption) ? tgShortestPath(grid.graph, nOption.value[0]) : [];
+};
+
+export const getIntensities = (grid: Grid): Record<number, number | undefined> => {
+  const d = distances(grid, [0, 0]);
+  const max = Object.values(d).reduce(
+    (currentMax: number, candidate: number | undefined) =>
+      Math.max(currentMax, candidate ?? 0),
+    0
+  );
+
+  return Object.fromEntries(
+    Object.entries(d).map(([i, dst]) => {
+      const actualDistance = dst ?? 0;
+      const intensity = (max - actualDistance) / max;
+      return [i, intensity];
+    })
+  );
 };
